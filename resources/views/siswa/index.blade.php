@@ -43,14 +43,14 @@
                                                     <form action="{{ route('siswa.index') }}" method="GET">
                                                         <div class="form-group">
                                                             <label for="tahun_filter">Filter Tahun Masuk</label>
-                                                                <select name="tahun_filter" id="tahun_filter" class="form-control">
-                                                                    <option value="">Tampilkan Semua</option>
-                                                                    @foreach ($tahunList as $tahun)
-                                                                        <option value="{{ $tahun }}" {{ $tahun == $selectedYear ? 'selected' : '' }}>
-                                                                            {{ $tahun }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select>                                                    
+                                                            <select name="tahun_filter" id="tahun_filter" class="form-control">
+                                                                <option value="">Tampilkan Semua</option>
+                                                                @foreach ($tahunList as $tahun)
+                                                                    <option value="{{ $tahun }}" {{ $tahun == $selectedYear ? 'selected' : '' }}>
+                                                                        {{ $tahun }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
                                                             <button type="submit" class="btn btn-sm btn-primary mt-1">Filter</button>
                                                         </div>
                                                     </form>
@@ -58,13 +58,16 @@
                                                 <div class="col-sm-3">
                                                     <form action="{{ route('siswa.index') }}" method="GET">
                                                         <div class="input-group">
-                                                            <input type="text" name="search" class="form-control" placeholder="Cari berdasarkan NIS dan Nama Siswa...">
+                                                            <input type="text" name="search" class="form-control" placeholder="Cari berdasarkan NIS dan Nama Siswa..." value="{{ request('search') }}">
+                                                            <input type="hidden" name="tahun_filter" value="{{ $selectedYear }}">
                                                             <span class="input-group-btn">
                                                                 <button class="btn btn-primary" type="submit">Cari</button>
                                                             </span>
                                                         </div>
                                                     </form>
                                                 </div>
+                                                
+                                                
 					                        </div>
                                             
 					                    </div>
@@ -75,6 +78,7 @@
 					                            <thead>
 					                                <tr>
                                                         <th>No</th>
+                                                        <th>Nama Sekolah</th>
                                                         <th>NIS</th>
 					                                    <th>Nama Siswa</th>
 					                                    <th>Tempat Lahir</th>
@@ -89,6 +93,13 @@
 													@foreach ($dataSiswaList as $item)
 					                                <tr>
                                                         <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
+                                                        <td style="vertical-align: middle;">
+                                                            @if ($item->sekolah)
+                                                                {{ $item->sekolah->nama_sekolah }}
+                                                            @else
+                                                                Nama Sekolah not assigned
+                                                            @endif
+                                                        </td> 
 					                                    <td style="vertical-align: middle;">{{ $item->nis_siswa}}</td>
 					                                    <td style="vertical-align: middle;">{{ $item->nama_siswa }}</td>
 					                                    <td style="vertical-align: middle;">{{ $item->tempat_lahir }}</td>  
@@ -133,7 +144,7 @@
 					                            </tbody>
 					                        </table>
 					                    </div>
-                                        {{ $dataSiswa->links('pagination::bootstrap-4') }}
+                                        {{ $dataSiswaList->links('pagination::bootstrap-4') }}
 					                    <hr class="new-section-xs">
 					                    
 					                </div>

@@ -6,6 +6,7 @@ use App\Models\DataUser;
 use App\Models\RoleMenu;
 use App\Models\Data_Menu;
 use App\Models\DataSiswa;
+use App\Models\Sekolah;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -20,7 +21,7 @@ class DataSiswaController extends Controller
      */
     public function index(Request $request)
     {
-        $dataSiswa = DataSiswa::orderBy('id_siswa', 'DESC')->paginate(10);
+        // $dataSiswa = DataSiswa::orderBy('id_siswa', 'DESC')->paginate(10);
 
         $tahunList = DB::table('data_siswa')
         ->select(DB::raw('YEAR(tahun_masuk) as tahun'))
@@ -28,39 +29,27 @@ class DataSiswaController extends Controller
         ->orderBy('tahun', 'desc')
         ->pluck('tahun');
 
-        
-
-        // $query = DataSiswa::query();
-
-        // if ($selectedYear) {
-        //     $query->where('tahun_masuk',$selectedYear);
-        //     dd($selectedYear, $query->toSql());
-        // }
-
         $selectedYear = $request->input('tahun_filter'); // Get the selected year from the form
+        $searchTerm = $request->input('search');
+
+        $dataSiswaQuery = DB::table('data_siswa');
+
+        $dataSiswaList = DataSiswa::with('sekolah') // Eager load the 'sekolah' relationship
+        ->when($selectedYear, function ($query) use ($selectedYear) {
+            $query->where('tahun_masuk', '=', $selectedYear);
+        })
+        ->when($searchTerm, function ($query) use ($searchTerm) {
+            $query->where(function ($subQuery) use ($searchTerm) {
+                $subQuery->where('nama_siswa', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('nis_siswa', 'like', '%' . $searchTerm . '%');
+            });
+        })
+        ->orderBy('id_siswa', 'DESC')
+        ->paginate(10);
+            
+        // $dataSiswaList = $dataSiswaQuery->orderBy('id_siswa', 'DESC')->with('sekolah')->paginate(10);
         
-        if ($selectedYear) {
-            $dataSiswaList = DataSiswa::where('tahun_masuk', '=', $selectedYear)->get();
-            // dd($selectedYear, $dataSiswaList);
-           
-        } else {
-            $dataSiswaList = DataSiswa::all();
-
-        }
-
-        // seacrh
-        $searchQuery = $request->input('search');
-
-        $query = DataSiswa::query();
-
-        if ($searchQuery) {
-            $query->where('nis_siswa', 'LIKE', '%' . $searchQuery . '%')
-                ->orWhere('nama_siswa', 'LIKE', '%' . $searchQuery . '%');
-        }
-        
-    //    nanti dataSiswanya diganti ini
-        // $dataSiswaList = $query->orderBy('id_siswa', 'DESC')->paginate(10);
-        // $dataSiswaList = $query->get();
+        // $dataSiswaList = $query->paginate(10);
 
 
         // sidebar menu
@@ -99,7 +88,7 @@ class DataSiswaController extends Controller
         }
 
 
-        return view('siswa.index', compact('dataSiswa','menuItemsWithSubmenus','tahunList','dataSiswaList','selectedYear'));
+        return view('siswa.index', compact('menuItemsWithSubmenus','tahunList','dataSiswaList','selectedYear'));
     }
 
     /**
@@ -108,6 +97,7 @@ class DataSiswaController extends Controller
     public function create()
     {
         $dataSiswa = DataSiswa::all();
+        $dataSekolah = Sekolah::all();
 
         // sidebar menu
         $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
@@ -136,7 +126,7 @@ class DataSiswaController extends Controller
                 ];
             }
 
-            return view('siswa.create', compact('dataSiswa','menuItemsWithSubmenus'));
+            return view('siswa.create', compact('dataSiswa','menuItemsWithSubmenus','dataSekolah'));
     }
 
     /**
@@ -145,12 +135,6 @@ class DataSiswaController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'password' => [
-            //     'required',
-            //     'string',
-            //     'min:6',
-            //     'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\#?!@$%^&*-]).{6,}$/'
-            // ],
             'foto_siswa' => 'required|file|mimes:jpeg,jpg,png',
             'nis_siswa' => 'required|unique:data_siswa,nis_siswa',
             'nama_siswa' => 'required',
@@ -180,6 +164,7 @@ class DataSiswaController extends Controller
 
         $dataSiswa = new DataSiswa;
         $dataSiswa->id_siswa = $request->id_siswa;
+        $dataSiswa->id_sekolah = $request->id_sekolah;
         $dataSiswa->nama_siswa = $request->nama_siswa;
         $dataSiswa->nis_siswa = $request->nis_siswa;
         $dataSiswa->tempat_lahir = $request->tempat_lahir;
@@ -207,6 +192,7 @@ class DataSiswaController extends Controller
     public function edit($id_siswa)
     {
         $dataSiswa = DataSiswa::where('id_siswa', $id_siswa)->first();
+        $dataSekolah = Sekolah::all();
 
         // MENU
         $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
@@ -234,7 +220,7 @@ class DataSiswaController extends Controller
                     'subMenus' => $subMenus,
                 ];
             }
-        return view('siswa.update', compact('dataSiswa','menuItemsWithSubmenus'));
+        return view('siswa.update', compact('dataSiswa','menuItemsWithSubmenus','dataSekolah'));
     }
 
     /**
@@ -273,7 +259,7 @@ class DataSiswaController extends Controller
 // Hapus baris berikut karena Anda sudah menggunakan DataSiswa::find
 // $dataSiswa = new DataSiswa;
 
-
+    $dataSiswa->id_sekolah = $request->id_sekolah;
     $dataSiswa->nama_siswa = $request->nama_siswa;
     $dataSiswa->nis_siswa = $request->nis_siswa;
     $dataSiswa->tempat_lahir = $request->tempat_lahir;

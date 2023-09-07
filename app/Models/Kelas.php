@@ -27,5 +27,9 @@ class Kelas extends Model
         return $this->hasMany(PelajaranKelas::class, 'id_kelas', 'id_kelas');
     }
 
+    public function kenaikanKelas()
+    {
+        return $this->hasMany(PelajaranKelas::class, 'id_kelas', 'id_kelas');
+    }
 }
 

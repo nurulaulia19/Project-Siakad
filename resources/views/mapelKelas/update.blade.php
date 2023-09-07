@@ -34,7 +34,7 @@
                                         <div class="form-group d-flex mb-3">
                                             <label class="col-sm-3 control-label" for="id_sekolah">Nama Sekolah</label>
                                             <div class="col-sm-9">
-                                                <select name="id_sekolah" id="id_sekolah" class="form-control">
+                                                <select name="id_sekolah" id="id_sekolah" class="form-control" onchange="handleSekolahChange(this.value)">
                                                     @foreach ($dataSekolah as $item)
                                                     <option value="{{ $item->id_sekolah }}" {{ $item->id_sekolah == $dataPk->id_sekolah ? 'selected' : '' }}>
                                                         {{ $item->nama_sekolah }}
@@ -53,34 +53,70 @@
                                                         {{ $item->nama_kelas }}
                                                     </option>
                                                     @endforeach
+                                                    
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="form-group d-flex mb-3">
+                                        {{-- <div class="form-group d-flex mb-3">
                                             <label class="col-sm-3 control-label" for="tahun_ajaran">Tahun Ajaran</label>
                                             <div class="col-sm-9">
                                                 <input type="text" placeholder="Nama Pelajaran" name="tahun_ajaran" id="tahun_ajaran" class="form-control" value="{{ $dataPk->tahun_ajaran }}">
                                                 <span id="tahunajaranError" class="error-message"></span>
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div class="form-group d-flex mb-3">
-                                            
+                                            <label class="col-sm-3 control-label" for="tahun_ajaran">Tahun Ajaran</label>
+                                            <div class="col-sm-9">
+                                                <select name="tahun_ajaran" id="tahun_ajaran" class="form-control" required>
+                                                    <option disabled>Pilih Tahun Ajaran</option>
+                                                    @php
+                                                        $currentYear = date('Y');
+                                                    @endphp
+                                                    @for ($year = 2020; $year <= $currentYear; $year++)
+                                                        <option value="{{ $year }}" {{ $year == $dataPk->tahun_ajaran ? 'selected' : '' }}>
+                                                            {{ $year }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                                @error('tahun_ajaran')
+                                                    <span class="invalid-feedback">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        
+                                        {{-- <div class="form-group d-flex mb-3">
+                                            <label class="col-sm-3 control-label" for="id_pelajaran">Mata Pelajaran</label>
+                                            <div class="col-sm-9">
+                                                <div class="checkbox-container" style="display: flex; flex-direction: column;">
+                                                    <div id="id_pelajaran">
+                                                        <!-- Daftar mata pelajaran akan ditampilkan di sini -->
+                                                    </div>
+                                                </div>
+                                                @error('id_pelajaran')
+                                                    <span class="alert text-danger">
+                                                        {{ $message }}
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div> --}}
+
+
+                                        <div class="form-group d-flex mb-3">
                                             <label class="col-sm-3 control-label" for="id_pelajaran">Mata Pelajaran</label>
                                             
                                             <div class="col-sm-9">
                                                 <div class="checkbox-container" style=" display: flex;
                                                 flex-direction: column;">
+                                                <div id="id_pelajaran">
                                                     @foreach ($dataPelajaran as $item)
-                                                    {{-- @php
-                                                         dd($item->id_pelajaran, $selectedMapelId);
-                                                    @endphp --}}
-                                                   
                                                     <div class="form-check">
                                                         <input class="form-check-input" name="id_pelajaran[]" type="checkbox" value="{{ $item->id_pelajaran }}" {{ in_array($item->id_pelajaran, $selectedMapelId) ? 'checked' : '' }}>
                                                         <label class="form-check-label">{{ $item->nama_pelajaran }}</label>
                                                     </div>
                                                     @endforeach
                                                   </div>
+                                                </div>
+                                                   
                                             </div>
                                         </div>
                                        
@@ -124,9 +160,80 @@
 
     <!--===================================================-->
     <!-- END OF CONTAINER -->
+
+    <script>
+        function handleSekolahChange(sekolahID) {
+            // var  = $('#sekolah').val();  
+            let token = $("meta[name='csrf-token']").attr("content");  
+            if (sekolahID) {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('mapelKelas.getKelas') }}",
+                    data: {
+                        'sekolahID': sekolahID,
+                        "_token": token
+                    },
+                    dataType: 'JSON',
+                    success: function(res) {  
+                        console.log(res);             
+                        if (res) {
+                            $("#id_kelas").empty();
+                            $("#id_kelas").append('<option disabled selected>Pilih Kelas</option>');
+                            $.each(res, function(nama_kelas, id_kelas) {
+                                $("#id_kelas").append('<option value="'+id_kelas+'">'+nama_kelas+'</option>');
+                            });
+                        } else {
+                            $("#id_kelas").empty();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error: " + error); // Menampilkan pesan kesalahan ke konsol
+                    }
+                });
+    
+                $.ajax({
+                type: "GET",
+                url: "{{ route('mapelKelas.getMapel') }}",
+                data: {
+                    'sekolahID': sekolahID,
+                    "_token": token
+                },
+                dataType: 'JSON',
+                success: function(res) {
+                    console.log(res);
+                    if (res) {
+                        // Hapus semua elemen di dalam #id_pelajaran
+                        $("#id_pelajaran").empty();
+                        
+                        // Tambahkan daftar mata pelajaran yang diterima dari server
+                        $.each(res, function(namaPelajaran, idPelajaran) {
+                            let checkBoxElement = $("<div class='form-check'>"+
+                                "<input class='form-check-input' name='id_pelajaran[]' type='checkbox' value='"+idPelajaran+"' id='id_pelajaran_"+idPelajaran+"'>"+
+                                "<label class='form-check-label'>"+namaPelajaran+"</label>"+
+                            "</div>");
+                            $("#id_pelajaran").append(checkBoxElement);
+                        });
+                    } else {
+                        $("#id_pelajaran").empty();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error: " + error);
+                }
+            });
+    
+                
+            } else {
+                $("#id_kelas").empty();
+                $("#id_pelajaran").empty();
+            }      
+    
+            
+        }
+    </script>
 @endsection
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
         $('#id_sekolah').change(function() {
@@ -154,7 +261,7 @@
             @endforeach
         });
     });
-</script>
+</script> --}}
 
 
 

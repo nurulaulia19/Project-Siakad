@@ -12,6 +12,7 @@ class DataSiswa extends Model
     protected $primaryKey = 'id_siswa';
     protected $fillable = [
             'id_siswa',
+            'id_sekolah',
             'nama_siswa',
             'nis_siswa',
             'tempat_lahir',
@@ -21,5 +22,15 @@ class DataSiswa extends Model
             'password',
             'foto_siswa',
     ];
+
+    public function sekolah()
+    {
+        return $this->belongsTo(Sekolah::class, 'id_sekolah', 'id_sekolah');
+    }
+
+    public function kenaikanKelas()
+    {
+        return $this->hasMany(KenaikanKelas::class, 'id_siswa', 'id_siswa');
+    }
 
 }

@@ -36,6 +36,22 @@
                                     {{ csrf_field() }}
                                     <div class="panel-body">
                                         <div class="form-group d-flex mb-3">
+                                            <label class="col-sm-3 control-label" for="id_sekolah">Nama Sekolah</label>
+                                            <div class="col-sm-9">
+                                                <select name="id_sekolah" id="id_sekolah" class="form-control">
+                                                    <option disabled selected>Pilih Sekolah</option>
+                                                    @foreach ($dataSekolah as $item)
+                                                        <option value="{{ $item->id_sekolah }}">{{ $item->nama_sekolah }}</option>
+                                                    @endforeach
+                                                </select>
+                                                @error('id_sekolah')
+                                                <span class="alert text-danger">
+                                                    {{ $message }}
+                                                </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="form-group d-flex mb-3">
                                             <label class="col-sm-3 control-label" for="nis_siswa">NIS</label>
                                             <div class="col-sm-9">
                                                 <input type="text" placeholder="NIS" name="nis_siswa" id="nis_siswa" class="form-control @error('nis_siswa') is-invalid @enderror">

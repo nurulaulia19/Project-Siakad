@@ -24,6 +24,7 @@ use App\Http\Controllers\DataPelajaranController;
 use App\Http\Controllers\DataSiswaController;
 use App\Http\Controllers\DataTokoController;
 use App\Http\Controllers\KelasController;
+use App\Http\Controllers\KenaikanKelasController;
 use App\Http\Controllers\MapelController;
 use App\Http\Controllers\PelajaranKelasController;
 use App\Http\Controllers\PrintController;
@@ -160,6 +161,9 @@ Route::get('/admin/mapelKelas/edit/{id}', [PelajaranKelasController::class, 'edi
 Route::post('/mapelKelas/store', [PelajaranKelasController::class, 'store']);
 Route::get('/admin/mapelKelas/destroy/{id}', [PelajaranKelasController::class,'destroy'])->name('mapelKelas.destroy');
 
+Route::get('/admin/mapelKelas/getKelas', [PelajaranKelasController::class, 'getKelas'])->name('mapelKelas.getKelas');
+Route::get('/admin/mapelKelas/getMapel', [PelajaranKelasController::class, 'getMapel'])->name('mapelKelas.getMapel');
+
 // filter berdasarkan sekolah
 // Route::get('/get-data-by-sekolah', [PelajaranKelasController::class,'create']);
 // Route::get('/get-options-by-sekolah', [PelajaranKelasController::class,'getOptionsBySekolah']);
@@ -172,4 +176,24 @@ Route::get('/admin/siswa', [DataSiswaController::class,'index'])->name('siswa.in
 Route::get('/admin/siswa/edit/{id}', [DataSiswaController::class, 'edit'])->name('siswa.edit');
 Route::post('/siswa/store', [DataSiswaController::class, 'store']);
 Route::get('/admin/siswa/destroy/{id}', [DataSiswaController::class,'destroy'])->name('siswa.destroy');
+
+
+// data kenaikan kelas
+Route::put('/admin/kenaikanKelas/update/{id}', [KenaikanKelasController::class, 'update'])->name('kenaikanKelas.update');
+Route::get('/admin/kenaikanKelas/create', [KenaikanKelasController::class, 'create'])->name('kenaikanKelas.create');
+Route::get('/admin/kenaikanKelas', [KenaikanKelasController::class,'index'])->name('kenaikanKelas.index');
+Route::get('/admin/kenaikanKelas/edit/{id}', [KenaikanKelasController::class, 'edit'])->name('kenaikanKelas.edit');
+Route::post('/kenaikanKelas/store', [KenaikanKelasController::class, 'store']);
+Route::get('/admin/kenaikanKelas/destroy/{id}', [KenaikanKelasController::class,'destroy'])->name('kenaikanKelas.destroy');
+// Route::get('/admin/kenaikanKelas/cariKelas', [KenaikanKelasController::class, 'cariKelas'])->name('kenaikanKelas.cariKelas');
+// Route::get('/getStudentsBySchool/{id_sekolah}', [KenaikanKelasController::class, 'getStudentsBySchool']);
+
+
+// Route::get('/get-siswa-by-sekolah/{id_sekolah}', [KenaikanKelasController::class,'getSiswaBySekolah']);
+
+Route::get('/admin/kenaikanKelas/getkelas', [KenaikanKelasController::class, 'getKelas'])->name('kenaikanKelas.getkelas');
+Route::get('/admin/kenaikanKelas/getsiswa', [KenaikanKelasController::class, 'getSiswa'])->name('kenaikanKelas.getsiswa');
+
+
+
 

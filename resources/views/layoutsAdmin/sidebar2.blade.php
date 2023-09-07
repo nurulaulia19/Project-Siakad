@@ -209,6 +209,7 @@
 									'Data Kelas' => 'fas fa-chalkboard',
 									'Data Mata Pelajaran' => 'fas fa-book',
 									'Data Siswa' => 'fas fa-users',
+									'Data Kenaikan Kelas' => 'fas fa-graduation-cap',
 
 									
 								];

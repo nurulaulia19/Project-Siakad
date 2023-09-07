@@ -7,6 +7,13 @@
 // - ThemeOn.net -
 
 
+$( document ).ready(function() {
+    $('#demo-cs-multiselect').chosen({width:'100%'});
+});
+
+// $('#demo-cs-multiselect').chosen({ width: '100%' });
+
+
 $(document).on('nifty.ready', function() {
 
 

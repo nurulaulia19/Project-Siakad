@@ -36,5 +36,9 @@ class Sekolah extends Model
         return $this->hasMany(PelajaranKelasList::class, 'id_sekolah', 'id_sekolah');
     }
 
+    public function siswa()
+    {
+        return $this->hasMany(DataSiswa::class, 'id_sekolah', 'id_sekolah');
+    }
 
 }

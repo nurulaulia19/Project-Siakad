@@ -312,17 +312,14 @@ class PelajaranKelasController extends Controller
 
    
 
-// public function getOptionsBySekolah(Request $request)
-// {
-//     $id_sekolah = $request->input('id_sekolah');
+    public function getKelas(Request $request){
+        $kelas = Kelas::where('id_sekolah', $request->sekolahID)->pluck('id_kelas', 'nama_kelas');
+        return response()->json($kelas);
+    }
 
-//     $dataPelajaran = DataPelajaran::where('id_sekolah', $id_sekolah)->get();
-//     $dataKelas = Kelas::where('id_sekolah', $id_sekolah)->get();
-
-//     return response()->json([
-//         'dataPelajaran' => $dataPelajaran,
-//         'dataKelas' => $dataKelas,
-//     ]);
-// }
+    public function getMapel(Request $request){
+        $mapel = DataPelajaran::where('id_sekolah', $request->sekolahID)->pluck('id_pelajaran', 'nama_pelajaran');
+        return response()->json($mapel);
+    }
 
 }

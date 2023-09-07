@@ -49,7 +49,38 @@
 
     {{-- <link href="{{ asset('assets/plugins/morris-js/morris.min.css') }}" rel="stylesheet"> --}}
 
-    
+    {{-- tambahan --}}
+
+    {{-- bner --}}
+
+    <!--Switchery [ OPTIONAL ]-->
+    <link href="{{ asset('assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet">
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="{{ asset('assets/plugins/bootstrap-select/bootstrap-select.min.css') }}" rel="stylesheet">
+
+
+    <!--Bootstrap Tags Input [ OPTIONAL ]-->
+    <link href="{{ asset('assets/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.css') }}" rel="stylesheet">
+
+
+    <!--Chosen [ OPTIONAL ]-->
+    <link href="{{ asset('assets/plugins/chosen/chosen.min.css') }}" rel="stylesheet">
+
+
+    <!--noUiSlider [ OPTIONAL ]-->
+    <link href="{{ asset('assets/plugins/noUiSlider/nouislider.min.css') }}" rel="stylesheet">
+
+    <!--Select2 [ OPTIONAL ]-->
+    <link href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
+
+
+    <!--Bootstrap Timepicker [ OPTIONAL ]-->
+    <link href="{{ asset('assets/plugins/bootstrap-timepicker/bootstrap-timepicker.min.css') }}" rel="stylesheet">
+
+
+    <!--Bootstrap Datepicker [ OPTIONAL ]-->
+    <link href="{{ asset('assets/plugins/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet">
 
     @yield('style')
 
@@ -111,11 +142,61 @@
 
     {{-- Menu --}}
     <script src="{{ asset('assets/js/menu.js') }}"></script>
+  
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
+
+  
+
+    {{-- tambahan --}}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!--Demo script [ DEMONSTRATION ]-->
+    <script src="{{ asset('assets/js/demo/nifty-demo.min.js') }}"></script>
+        
+    <!--Switchery [ OPTIONAL ]-->
+    <script src="{{ asset('assets/plugins/switchery/switchery.min.js') }}"></script>
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="{{ asset('assets/plugins/bootstrap-select/bootstrap-select.min.js') }}"></script>
+
+
+    <!--Bootstrap Tags Input [ OPTIONAL ]-->
+    <script src="{{ asset('assets/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js') }}"></script>
+
+
+    <!--Chosen [ OPTIONAL ]-->
+    <script src="{{ asset('assets/plugins/chosen/chosen.jquery.min.js') }}"></script>
+
+    
+    <!--noUiSlider [ OPTIONAL ]-->
+    <script src="{{ asset('assets/plugins/noUiSlider/nouislider.min.js') }}"></script>
+
+
+    <!--Select2 [ OPTIONAL ]-->
+    <script src="{{ asset('assets/plugins/select2/js/select2.min.js') }}"></script>
+
+
+    <!--Bootstrap Timepicker [ OPTIONAL ]-->
+    <script src="{{ asset('assets/plugins/bootstrap-timepicker/bootstrap-timepicker.min.js') }}"></script>
+
+    <!--Bootstrap Datepicker [ OPTIONAL ]-->
+    <script src="{{ asset('assets/plugins/bootstrap-datepicker/bootstrap-datepicker.min.js') }}"></script>
+
+   
+
+    <script src="{{ asset('assets/js/demo/form-component.js') }}"></script>
+    
+    {{-- <script>
+        $( document ).ready(function() {
+    $('#demo-cs-multiselect').chosen({width:'100%'});
+});
+    </script> --}}
 
     @yield('script')
+      
 
     <script>
       function validateForm(event) {
@@ -182,103 +263,12 @@
   }
   </script>
 
-<script>
-    function validateForm(event) {
-        var userName = document.getElementById("id_kategori").value;
-        var userEmail = document.getElementById("nama_produk").value;
-        var userPassword = document.getElementById("harga_produk").value;
-        var userGender = document.getElementById("gambar_produk").value;
-        var userPhoto = document.getElementById("diskon_produk").value;
-        var isFormValid = true;
 
-        if (userName.trim() === "") {
-            document.getElementById("kategoriError").textContent = "Silahkan pilih kategori!";
-            isFormValid = false;
-        } else {
-            document.getElementById("kategoriError").textContent = "";
-        }
-
-        if (userEmail.trim() === "") {
-            document.getElementById("produkError").textContent = "Produk tidak boleh kosong!";
-            isFormValid = false;
-        } else {
-            document.getElementById("produkError").textContent = "";
-        }
-
-        if (userPassword.trim() === "") {
-            document.getElementById("hargaError").textContent = "Harga produk tidak boleh kosong!";
-            isFormValid = false;
-        } else {
-            document.getElementById("hargaError").textContent = "";
-        }
-
-        if (userGender === "") {
-            document.getElementById("gambarError").textContent = "Silakan pilih gambar!";
-            isFormValid = false;
-        } else {
-            document.getElementById("gambarError").textContent = "";
-        }
-    if (userPhoto.trim() === "") {
-        document.getElementById("diskonError").textContent = "Silahkan pilih diskon!";
-        isFormValid = false;
-    } else {
-        document.getElementById("diskonError").textContent = "";
-    }
-
-    if (!isFormValid) {
-        event.preventDefault(); // Menghentikan pengiriman form jika ada error
-    }
-}
-</script>
-
-<script>
-    function validateForm(event) {
-        var userName = document.getElementById("nama_kategori").value;
-        var isFormValid = true;
-
-        if (userName.trim() === "") {
-            document.getElementById("nama_kategoriError").textContent = "Nama kategori harus diisi!";
-            isFormValid = false;
-        } else {
-            document.getElementById("nama_kategoriError").textContent = "";
-        }
-
-    if (!isFormValid) {
-        event.preventDefault(); // Menghentikan pengiriman form jika ada error
-    }
-}
-</script>
 
 
 {{-- modal --}}
 <!-- Letakkan script JavaScript di bagian bawah dokumen HTML -->
-<script>
-    // Dapatkan semua elemen gambar
-    const images = document.querySelectorAll('img[data-target^="modal"]');
-  
-    // Tambahkan event listener untuk setiap gambar
-    images.forEach((image) => {
-      image.addEventListener('click', () => {
-        const targetModalId = image.getAttribute('data-target');
-        const modal = document.getElementById(targetModalId);
-  
-        // Tampilkan modal
-        modal.style.display = "block";
-  
-        // Fungsi untuk menutup modal ketika ikon close di klik
-        modal.querySelector('.close').onclick = function () {
-          modal.style.display = "none";
-        }
-  
-        // Fungsi untuk menutup modal ketika area di luar modal di klik
-        window.onclick = function (event) {
-          if (event.target == modal) {
-            modal.style.display = "none";
-          }
-        }
-      });
-    });
-  </script>
+<
 <script>
     function confirmDelete() {
         if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
@@ -290,150 +280,6 @@
         }
     }
 </script>
-
-{{-- <!-- Add this within your HTML file, e.g., in the <head> section -->
-    <script>
-function updateTotalPrice(inputElement, hargaAditional) {
-  const jumlahJasa = parseInt(inputElement.value);
-  const hargaJasaElement = inputElement.closest('tr').querySelector('.harga-perkg');
-  const diskonJasaElement = inputElement.closest('tr').querySelector('.diskon-jasa');
-  const totalHargaSetelahDiskonElement = inputElement.closest('tr').querySelector('.total-harga-setelah-diskon');
-
- 
-  const hargaJasaText = hargaJasaElement.textContent.replace(/\./g, '').replace(',', '.');
-  const hargaJasa = parseFloat(hargaJasaText);
-
-  const diskonPersen = parseFloat(diskonJasaElement.textContent);
-
-  const totalHargaAdditional =  hargaAditional * jumlahJasa ;
-//   console.log("Harga Aditional:", hargaAditional);
-  const totalHargaSebelumDiskon = hargaProduk * jumlahJasa;
-//   const totalHargaAdditional = inputElement.closest('tr').querySelector('.harga-aditional'); // You can update this logic to calculate the additional price if needed
-//   console.log(totalHargaAdditional);
-  const diskonNominal = (totalHargaSebelumDiskon + totalHargaAdditional) * (diskonPersen / 100);
-  const totalHargaSetelahDiskon = totalHargaSebelumDiskon + totalHargaAdditional - diskonNominal;
-  
-
-  // Update the total harga setelah diskon for this row
-totalHargaSetelahDiskonElement.textContent = formatNumber(totalHargaSetelahDiskon);
-
-  
-
-  // Recalculate the overall total harga
-  updateOverallTotal();
-}
-
-// Update the overall total harga element on the page
-function updateOverallTotal() {
-  const totalHargaElements = document.querySelectorAll('.total-harga-setelah-diskon');
-  let totalSemuaHarga = 0;
-
-  totalHargaElements.forEach((element) => {
-    const totalHargaText = element.textContent.replace(/\./g, '').replace(',', '.');
-    const totalHarga = parseFloat(totalHargaText);
-    totalSemuaHarga += totalHarga;
-  });
-
-  const overallTotalElement = document.querySelector('.overall-total');
-  overallTotalElement.textContent = formatNumber(totalSemuaHarga);
-
-  // Update the value of the input field with the latest overall total harga
-  const totalHargaDiskon = document.getElementById('total_harga_setelah_diskon');
-  const totalHargaInput = document.getElementById('total_harga_input');
-  totalHargaInput.value = formatNumber(totalSemuaHarga - int(totalHargaDiskon));
-}
-
-// Rest of the JavaScript code (updateTotalPrice and formatNumber functions)
-
-// Calculate the initial overall total harga and set the value of the input field
-updateOverallTotal();
-
-
-function formatNumber(number) {
-  return new Intl.NumberFormat('id-ID', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(number);
-}
-
-// Add event listeners for input elements with class "jumlah-produk"
-const jumlahProdukInputs = document.querySelectorAll('.jumlah-jasa');
-jumlahProdukInputs.forEach((input) => {
-  input.addEventListener('input', function () {
-    updateTotalPrice(input);
-  });
-});
-
-// Calculate the initial overall total harga
-// updateOverallTotal();
-</script> --}}
-
-<!-- Add this within your HTML file, e.g., in the <head> section -->
-  <script>
-    function updateTotalPrice(inputElement) {
-      const jumlahJasa = parseInt(inputElement.value);
-      const hargaJasaElement = inputElement.closest('tr').querySelector('.harga-perkg');
-      const diskonJasaElement = inputElement.closest('tr').querySelector('.diskon-jasa');
-      const totalHargaSetelahDiskonElement = inputElement.closest('tr').querySelector('.total-harga-setelah-diskon');
-    
-      const hargaJasaText = hargaJasaElement.textContent.replace(/\./g, '').replace(',', '.');
-      const hargaJasa = parseFloat(hargaJasaText);
-    
-      const diskonPersen = parseFloat(diskonJasaElement.textContent);
-    
-      const totalHargaSebelumDiskon = hargaJasa * jumlahJasa;
-    
-      const diskonNominal = totalHargaSebelumDiskon * (diskonPersen / 100);
-      const totalHargaSetelahDiskon = totalHargaSebelumDiskon - diskonNominal;
-    
-      // Update the total harga setelah diskon for this row
-      totalHargaSetelahDiskonElement.textContent = formatNumber(totalHargaSetelahDiskon);
-    
-      // Recalculate the overall total harga
-      updateOverallTotal();
-    }
-    
-    // Update the overall total harga element on the page
-    function updateOverallTotal() {
-      const totalHargaElements = document.querySelectorAll('.total-harga-setelah-diskon');
-      let totalSemuaHarga = 0;
-    
-      totalHargaElements.forEach((element) => {
-        const totalHargaText = element.textContent.replace(/\./g, '').replace(',', '.');
-        const totalHarga = parseFloat(totalHargaText);
-        totalSemuaHarga += totalHarga;
-      });
-    
-      const overallTotalElement = document.querySelector('.overall-total');
-      overallTotalElement.textContent = formatNumber(totalSemuaHarga);
-    
-      // Update the value of the input field with the latest overall total harga
-      const totalHargaDiskon = document.getElementById('total_harga_setelah_diskon');
-      const totalHargaInput = document.getElementById('total_harga_input');
-      totalHargaInput.value = formatNumber(totalSemuaHarga - totalHargaDiskon.value.replace(/\./g, '').replace(',', '.'));
-    }
-    
-    // Calculate the initial overall total harga and set the value of the input field
-    updateOverallTotal();
-    
-    function formatNumber(number) {
-      return new Intl.NumberFormat('id-ID', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(number);
-    }
-    
-    // Add event listeners for input elements with class "jumlah-jasa"
-    const jumlahJasaInputs = document.querySelectorAll('.jumlah-jasa');
-    jumlahJasaInputs.forEach((input) => {
-      input.addEventListener('input', function () {
-        updateTotalPrice(input);
-      });
-    });
-</script>
-    
-
-
 
     <!--=================================================-->
   </body>

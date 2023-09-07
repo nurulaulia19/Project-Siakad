@@ -1,7 +1,3 @@
-
-
-{{-- bener --}}
-
 @extends('layoutsAdmin.main')
 @section('content')
     <div id="container" class="effect aside-float aside-bright mainnav-lg">
@@ -27,12 +23,12 @@
 					    <div class="row">
                             <div class="panel">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Tambah Pelajaran Perkelas</h3>
+                                    <h3 class="panel-title">Tambah Data Kenaikan kelas</h3>
                                 </div>
                         
                                 <!--Horizontal Form-->
                                 <!--===================================================-->
-                                <form method="POST" action="/mapelKelas/store" enctype="multipart/form-data">
+                                <form method="POST" action="/kenaikanKelas/store" enctype="multipart/form-data">
                                     {{ csrf_field() }}
                                     <div class="panel-body">
                                         <div class="form-group d-flex mb-3">
@@ -80,52 +76,24 @@
                                                     @endphp
                                                 </select>
                                                 @error('tahun_ajaran')
-                                                <span class="alert text-danger">
-                                                    {{ $message }}
-                                                </span>
+                                                    <span class="invalid-feedback">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                         </div>
                                         <div class="form-group d-flex mb-3">
-                                            <label class="col-sm-3 control-label" for="id_pelajaran">Mata Pelajaran</label>
+                                            <label class="col-sm-3 control-label" for="nis_siswa">Siswa</label>
                                             <div class="col-sm-9">
-                                                <div class="checkbox-container" style="display: flex; flex-direction: column;">
-                                                    <div id="id_pelajaran">
-                                                        <!-- Daftar mata pelajaran akan ditampilkan di sini -->
-                                                    </div>
-                                                </div>
-                                                @error('id_pelajaran')
-                                                    <span class="alert text-danger">
-                                                        {{ $message }}
-                                                    </span>
-                                                @enderror
+                                                <select name="nis_siswa[]" id="demo-cs-multiselect" class="form-control" data-placeholder="Pilih Siswa..." multiple>
+					                                {{-- @foreach ($dataSiswa as $siswa)
+                                                        <option value="{{ $siswa->nis_siswa }}">{{ $siswa->nis_siswa }} | {{ $siswa->nama_siswa }}</option>
+                                                    @endforeach --}}
+					                            </select>
                                             </div>
                                         </div>
-                                        
-                                        
-                                        {{-- <div class="form-group d-flex mb-3">
-                                            <label class="col-sm-3 control-label" for="menu_link">Mata Pelajaran</label>
-                                            <div class="col-sm-9">
-                                                <div class="checkbox-container" style=" display: flex;
-                                                flex-direction: column;">
-                                                    @foreach ($dataPelajaran as $item)
-                                                    <div class="form-check">
-                                                      <input class="form-check-input" name="id_pelajaran[]" type="checkbox" value="{{ $item->id_pelajaran }}" id="id_pelajaran">
-                                                      <label class="form-check-label">{{ $item->nama_pelajaran }}</label>
-                                                    </div>
-                                                    @endforeach
-                                                  </div>
-                                                  @error('id_pelajaran')
-                                                    <span class="alert text-danger">
-                                                        {{ $message }}
-                                                    </span>
-                                                  @enderror
-                                            </div>
-                                        </div> --}}
                                     </div>
                                     <div class="panel-footer text-right">
-                                        <a href="{{ route('mapelKelas.index') }}" class="btn btn-secondary">KEMBALI</a>
-                                        <button type="submit" onclick="validateForm(event)" class="btn btn-primary">SIMPAN</button>
+                                        <a href="{{ route('kenaikanKelas.index') }}" class="btn btn-secondary">KEMBALI</a>
+                                        <button type="submit" class="btn btn-primary">SIMPAN</button>
                                     </div>
                                 </form>
                                 <!--===================================================-->
@@ -138,11 +106,7 @@
                                 {{ session('error') }}
                             </div>
 				        @endif
-                        {{-- @error('id_kelas')
-                        <div class="alert alert-danger mt-2">
-                            {{ $message }}
-                        </div>
-                        @enderror --}}
+					
 					    
                 </div>
                 <!--===================================================-->
@@ -163,6 +127,7 @@
     <!--===================================================-->
     <!-- END OF CONTAINER -->
 
+    {{-- filter data kelas dan data siswa berdasarkan id sekolah --}}
     <script>
         function handleSekolahChange(sekolahID) {
             // var  = $('#sekolah').val();  
@@ -170,7 +135,7 @@
             if (sekolahID) {
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('mapelKelas.getKelas') }}",
+                    url: "{{ route('kenaikanKelas.getkelas') }}",
                     data: {
                         'sekolahID': sekolahID,
                         "_token": token
@@ -193,78 +158,92 @@
                     }
                 });
     
-                $.ajax({
-                type: "GET",
-                url: "{{ route('mapelKelas.getMapel') }}",
-                data: {
-                    'sekolahID': sekolahID,
-                    "_token": token
-                },
-                dataType: 'JSON',
-                success: function(res) {
-                    console.log(res);
-                    if (res) {
-                        // Hapus semua elemen di dalam #id_pelajaran
-                        $("#id_pelajaran").empty();
-                        
-                        // Tambahkan daftar mata pelajaran yang diterima dari server
-                        $.each(res, function(namaPelajaran, idPelajaran) {
-                            let checkBoxElement = $("<div class='form-check'>"+
-                                "<input class='form-check-input' name='id_pelajaran[]' type='checkbox' value='"+idPelajaran+"' id='id_pelajaran_"+idPelajaran+"'>"+
-                                "<label class='form-check-label'>"+namaPelajaran+"</label>"+
-                            "</div>");
-                            $("#id_pelajaran").append(checkBoxElement);
-                        });
-                    } else {
-                        $("#id_pelajaran").empty();
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error: " + error);
-                }
-            });
     
-                
+    
+                 // Mengambil data siswa berdasarkan sekolah
+                 $.ajax({
+                    type: "GET",
+                    url: "{{ route('kenaikanKelas.getsiswa') }}",
+                    data: {
+                        'sekolahID': sekolahID,
+                        "_token": token
+                    },
+                    dataType: 'JSON',
+                    beforeSend: function(){ 
+                      $('ul.chosen-results').empty(); 
+                      $("#demo-cs-multiselect").empty(); 
+                    },
+                    success: function(res2) { 
+                                     
+                        if (res2) {
+                            console.log(res2);
+                            $("#demo-cs-multiselect").empty();
+                            // $("#demo-cs-multiselect").append('<option disabled selected>Pilih Siswa</option>');
+                            $.each(res2, function(nama_siswa, nis_siswa) {
+                                console.log(nama_siswa);
+                                // $("#demo-cs-multiselect").append('<option value="'+id_siswa+'">'+nama_siswa+'</option>');
+                                $("#demo-cs-multiselect").append('<option value="' + nis_siswa + '">' + nis_siswa + ' | ' + nama_siswa + '</option>');
+
+                            });
+                            $("#demo-cs-multiselect").trigger("chosen:updated");
+                        } else {
+                            $("#demo-cs-multiselect").empty();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error: " + error); // Menampilkan pesan kesalahan ke konsol
+                    }
+                });
             } else {
                 $("#id_kelas").empty();
-                $("#id_pelajaran").empty();
+                $("#demo-cs-multiselect").empty();
             }      
     
             
         }
     </script>
+    
 @endsection
 
-{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('#id_sekolah').change(function() {
-            var selectedSekolahId = $(this).val();
-
-            // Clear and populate dataKelas dropdown
-            $('#id_kelas').empty().append('<option value="">Pilih Kelas</option>');
-            @foreach ($dataKelas as $kelas)
-                if ('{{ $kelas->id_sekolah }}' === selectedSekolahId) {
-                    $('#id_kelas').append('<option value="{{ $kelas->id_kelas }}">{{ $kelas->nama_kelas }}</option>');
-                }
-            @endforeach
-
-            // Clear and populate dataPelajaran checkbox (multiple)
-            $('.checkbox-container').empty();
-            @foreach ($dataPelajaran as $item)
-                if ('{{ $item->sekolah->id_sekolah }}' === selectedSekolahId) {
-                    $('.checkbox-container').append(`
-                        <div class="form-check">
-                            <input class="form-check-input" name="id_pelajaran[]" type="checkbox" value="{{ $item->id_pelajaran }}">
-                            <label class="form-check-label">{{ $item->nama_pelajaran }}</label>
-                        </div>
-                    `);
-                }
-            @endforeach
-        });
-    });
-</script> --}}
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+ 
+
+
+  
+
+  
+
+
+
+
+
+
+
+
+{{-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> --}}
