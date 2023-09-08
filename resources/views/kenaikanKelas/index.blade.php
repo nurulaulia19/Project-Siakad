@@ -37,13 +37,47 @@
 													<a href="{{ route('kenaikanKelas.create') }}" class="btn btn-purple">
 														<i class="demo-pli-add icon-fw"></i>Add
 													</a>
-													
 					                            </div>
-                                                <div class="col-sm-6">
+                                                <div class="col-sm-2">
                                                     <form action="{{ route('kenaikanKelas.index') }}" method="GET">
-                                                        <div class="input-group">
-                                                            <input type="text" name="search" class="form-control" placeholder="Cari berdasarkan NIS Siswa..." value="{{ request('search') }}">
-                                                            {{-- <input type="hidden" name="tahun_filter" value="{{ $selectedYear }}"> --}}
+                                                        <div class="form-group">
+                                                            <label for="sekolah_filter">Filter Sekolah</label>
+                                                            <select name="sekolah_filter" id="sekolah_filter" class="form-control">
+                                                                <option value="">Tampilkan Semua</option>
+                                                                @foreach ($dataSekolah as $sekolah)
+                                                                    <option value="{{ $sekolah->id_sekolah }}" {{ $sekolahFilter == $sekolah->id_sekolah ? 'selected' : '' }}>
+                                                                        {{ $sekolah->nama_sekolah }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                            <button type="submit" class="btn btn-sm btn-primary mt-1">Filter</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <form action="{{ route('kenaikanKelas.index') }}" method="GET">
+                                                        <div class="form-group">
+                                                            <label for="tahun_ajaran_filter">Filter Tahun Ajaran</label>
+                                                            <input type="hidden" name="sekolah_filter" value="{{ $sekolahFilter }}">
+                                                            <select name="tahun_ajaran_filter" id="tahun_ajaran_filter" class="form-control">
+                                                                <option value="">Tampilkan Semua</option>
+                                                                @foreach ($tahunAjarans as $tahunAjaran)
+                                                                    <option value="{{ $tahunAjaran }}" {{ $tahunAjaranFilter == $tahunAjaran ? 'selected' : '' }}>
+                                                                        {{ $tahunAjaran }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                            <button type="submit" class="btn btn-sm btn-primary mt-1">Filter</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <form action="{{ route('kenaikanKelas.index') }}" method="GET">
+                                                        <label for="tahun_ajaran_filter">Cari NIS siswa</label>
+                                                        <div class="input-group" >
+                                                            <input type="hidden" name="sekolah_filter" value="{{ $sekolahFilter }}">
+                                                            <input type="hidden" name="tahun_ajaran_filter" value="{{ $tahunAjaranFilter }}">
+                                                            <input type="text" name="search" class="form-control" placeholder="Cari" value="{{ request('search') }}">
                                                             <span class="input-group-btn">
                                                                 <button class="btn btn-primary" type="submit">Cari</button>
                                                             </span>
@@ -69,6 +103,7 @@
 													@foreach ($groupedData as $id_sekolah => $kelasData)
                                                         @foreach ($kelasData as $id_kelas => $tahunData)
                                                             @foreach ($tahunData as $tahun_ajaran => $group)
+                                                                
                                                                 @php $firstItem = $group[0]; @endphp
                                                                 <tr>
                                                                     <td style="vertical-align: middle;">{{ ++$iteration }}</td>
