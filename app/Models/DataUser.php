@@ -45,8 +45,8 @@ class DataUser extends Authenticatable
         return $this->update($data);
     }
 
-    public function mapel()
+    public function guruMapel()
     {
-        return $this->hasMany(DataPelajaran::class, 'user_id', 'user_id');
+        return $this->hasMany(GuruPelajaran::class, 'user_id', 'user_id');
     }
 }

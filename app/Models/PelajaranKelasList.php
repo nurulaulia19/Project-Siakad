@@ -30,4 +30,9 @@ class PelajaranKelasList extends Model
     {
         return $this->belongsTo(PelajaranKelas::class, 'id_pk', 'id_pk');
     }
+
+    public function guruMapel()
+    {
+        return $this->hasMany(GuruPelajaran::class, 'id_pkl', 'id_pkl');
+    }
 }

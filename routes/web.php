@@ -23,6 +23,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DataPelajaranController;
 use App\Http\Controllers\DataSiswaController;
 use App\Http\Controllers\DataTokoController;
+use App\Http\Controllers\GuruPelajaranController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KenaikanKelasController;
 use App\Http\Controllers\MapelController;
@@ -194,6 +195,18 @@ Route::get('/admin/kenaikanKelas/destroy/{id}', [KenaikanKelasController::class,
 Route::get('/admin/kenaikanKelas/getkelas', [KenaikanKelasController::class, 'getKelas'])->name('kenaikanKelas.getkelas');
 Route::get('/admin/kenaikanKelas/getsiswa', [KenaikanKelasController::class, 'getSiswa'])->name('kenaikanKelas.getsiswa');
 
+
+// data guru 
+Route::put('/admin/guruMapel/update/{id}', [GuruPelajaranController::class, 'update'])->name('guruMapel.update');
+Route::get('/admin/guruMapel/create', [GuruPelajaranController::class, 'create'])->name('guruMapel.create');
+Route::get('/admin/guruMapel', [GuruPelajaranController::class,'index'])->name('guruMapel.index');
+Route::get('/admin/guruMapel/edit/{id}', [GuruPelajaranController::class, 'edit'])->name('guruMapel.edit');
+Route::post('/guruMapel/store', [GuruPelajaranController::class, 'store']);
+Route::get('/admin/guruMapel/destroy/{id}', [GuruPelajaranController::class,'destroy'])->name('guruMapel.destroy');
+
+
+Route::get('/admin/guruMapel/getKelas', [GuruPelajaranController::class, 'getKelas'])->name('guruMapel.getKelas');
+Route::get('/admin/guruMapel/getMapel', [GuruPelajaranController::class, 'getMapel'])->name('guruMapel.getMapel');
 
 
 

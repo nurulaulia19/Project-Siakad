@@ -45,7 +45,7 @@
                                                 <span id="namapelajaranError" class="error-message"></span>
                                             </div>
                                         </div>
-                                        <div class="form-group d-flex mb-3">
+                                        {{-- <div class="form-group d-flex mb-3">
                                             <label class="col-sm-3 control-label" for="user_id">Nama Guru</label>
                                             <div class="col-sm-9">
                                                 <select name="user_id" id="user_id" class="form-control">
@@ -57,7 +57,7 @@
                                                 </select>
                                                 <span id="namasekolahError" class="error-message"></span>
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div class="form-group d-flex mb-3">
                                             <label class="col-sm-3 control-label" for="id_sekolah">Nama Sekolah</label>
                                             <div class="col-sm-9">

@@ -13,7 +13,6 @@ class DataPelajaran extends Model
     protected $fillable = [
             'id_pelajaran',
             'kode_pelajaran',
-            'user_id',
             'id_sekolah',
             'nama_pelajaran',
     ];
@@ -23,13 +22,23 @@ class DataPelajaran extends Model
         return $this->belongsTo(Sekolah::class, 'id_sekolah', 'id_sekolah');
     }
 
-    public function user()
-    {
-        return $this->belongsTo(DataUser::class, 'user_id', 'user_id');
-    }
+    // public function user()
+    // {
+    //     return $this->belongsTo(DataUser::class, 'user_id', 'user_id');
+    // }
+
+    // public function mapelList()
+    // {
+    //     return $this->hasMany(PelajaranKelasList::class, 'id_sekolah', 'id_sekolah');
+    // }
 
     public function mapelList()
     {
-        return $this->hasMany(PelajaranKelasList::class, 'id_sekolah', 'id_sekolah');
+        return $this->hasMany(PelajaranKelasList::class, 'id_pelajaran', 'id_pelajaran');
+    }
+
+    public function guruMapel()
+    {
+        return $this->hasMany(GuruPelajaran::class, 'id_pelajaran', 'id_pelajaran');
     }
 }

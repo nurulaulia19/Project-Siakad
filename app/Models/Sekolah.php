@@ -41,4 +41,9 @@ class Sekolah extends Model
         return $this->hasMany(DataSiswa::class, 'id_sekolah', 'id_sekolah');
     }
 
+    public function guruMapel()
+    {
+        return $this->hasMany(GuruPelajaran::class, 'id_sekolah', 'id_sekolah');
+    }
+
 }

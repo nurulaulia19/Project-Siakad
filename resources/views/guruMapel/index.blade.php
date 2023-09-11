@@ -25,7 +25,7 @@
 					        <div class="col-xs-12">
 					            <div class="panel">
 					                <div class="panel-heading">
-					                    <h3 class="panel-title">Data Pelajaran</h3>
+					                    <h3 class="panel-title">Data Guru Mata Pelajaran</h3>
 					                </div>
 					
 					                <!--Data Table-->
@@ -34,7 +34,7 @@
 					                    <div class="pad-btm form-inline">
 					                        <div class="row">
 					                            <div class="col-sm-6 table-toolbar-left">
-													<a href="{{ route('mapel.create') }}" class="btn btn-purple">
+													<a href="{{ route('guruMapel.create') }}" class="btn btn-purple">
 														<i class="demo-pli-add icon-fw"></i>Add
 													</a>
 													
@@ -46,39 +46,55 @@
 					                            <thead>
 					                                <tr>
                                                         <th>No</th>
-                                                        <th>Kode Pelajaran</th>
-                                                        <th>Nama Pelajaran</th>
+                                                        <th>Nama Kelas</th>
 					                                    <th>Nama Sekolah</th>
+                                                        <th>Tahun Ajaran</th>
+                                                        <th>Mata Pelajaran</th>
+                                                        <th>Nama Guru</th>
 					                                </tr>
 					                            </thead>
 					                            <tbody>
 													
-													@foreach ($dataPelajaran as $item)
+													@foreach ($dataGp as $item)
 					                                <tr>
                                                         <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
-                                                        <td style="vertical-align: middle;">{{ $item->kode_pelajaran}}</td>  
-					                                    <td style="vertical-align: middle;">{{ $item->nama_pelajaran}}</td>  
-                                                        {{-- <td style="vertical-align: middle;">
+                                                        <td style="vertical-align: middle;">
+                                                            @if ($item->kelas)
+                                                                {{ $item->kelas->nama_kelas }}
+                                                            @else
+                                                                Nama Kelas not assigned
+                                                            @endif
+                                                        </td>
+                                                        <td style="vertical-align: middle;">
+                                                            @if ($item->sekolah)
+                                                                {{ $item->sekolah->nama_sekolah }}
+                                                            @else
+                                                                Nama Sekolah not assigned
+                                                            @endif
+                                                        </td>    
+                                                        {{-- <td> @foreach ($item->mapelList as $mapelList)
+															{{ $mapelList->sekolah->nama_sekolah }}
+															@if (!$loop->last)
+																,
+															@endif
+															@endforeach
+														</td>  --}}
+                                                        <td style="vertical-align: middle;">{{ $item->tahun_ajaran }}</td>    
+                                                        <td style="vertical-align: middle;">{{ $item->mapel->nama_pelajaran}}</td>   
+                                                        <td style="vertical-align: middle;">
                                                             @if ($item->user)
                                                                 {{ $item->user->user_name }}
                                                             @else
                                                                 Nama Guru not assigned
                                                             @endif
-                                                        </td>      --}}
-                                                        <td style="vertical-align: middle;">
-                                                            @if ($item->sekolah)
-                                                                {{ $item->sekolah->nama_sekolah }}
-                                                            @else
-                                                                Sekolah not assigned
-                                                            @endif
-                                                        </td>                                              
+                                                        </td>                                       
 														<td class="table-action" style="vertical-align: middle;">
                                                             <div style="display:flex; align-items:center">
-                                                                <a style="margin-right: 10px;" href="{{ route( 'mapel.edit', $item->id_pelajaran) }}" class="btn btn-sm btn-warning">Edit</a>
-															<form method="POST" action="" id="delete-form-{{ $item->id_pelajaran }}">
+                                                                <a style="margin-right: 10px;" href="{{ route( 'guruMapel.edit', $item->id_gp) }}" class="btn btn-sm btn-warning">Edit</a>
+															<form method="POST" action="" id="delete-form-{{ $item->id_gp }}">
 																@csrf
                 												@method('DELETE')
-																<a href="/admin/mapel/destroy/{{ $item->id_pelajaran }}" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $item->id_pelajaran }})">Hapus</a>				
+																<a href="/admin/guruMapel/destroy/{{ $item->id_gp }}" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $item->id_pk }})">Hapus</a>				
 															</form>	
                                                             </div>													
 														</td>
@@ -99,7 +115,7 @@
 					                            </tbody>
 					                        </table>
 					                    </div>
-                                        {{ $dataPelajaran->links('pagination::bootstrap-4') }}
+                                        {{ $dataGp->links('pagination::bootstrap-4') }}
 					                    <hr class="new-section-xs">
 					                    
 					                </div>

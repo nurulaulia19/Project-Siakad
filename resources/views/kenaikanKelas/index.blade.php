@@ -100,7 +100,7 @@
 					                            </thead>
 					                            <tbody>
                                                     @php $iteration = 0; @endphp
-													@foreach ($groupedData as $id_sekolah => $kelasData)
+													{{-- @foreach ($groupedData as $id_sekolah => $kelasData)
                                                         @foreach ($kelasData as $id_kelas => $tahunData)
                                                             @foreach ($tahunData as $tahun_ajaran => $group)
                                                                 
@@ -130,7 +130,6 @@
                                                                             @endif
                                                                         @endforeach
                                                                     </td>
-                                                                    {{-- <td style="vertical-align: middle;">{{ $firstItem->nama_siswa }}</td> --}}
                                                                     <td class="table-action" style="vertical-align: middle;">
                                                                         <div style="display:flex; align-items:center">
                                                                             <a style="margin-right: 10px;" href="{{ route('kenaikanKelas.edit', $firstItem->id_kk) }}" class="btn btn-sm btn-warning">Edit</a>
@@ -144,9 +143,9 @@
                                                                 </tr>
                                                             @endforeach
                                                         @endforeach
-                                                    @endforeach
+                                                    @endforeach --}}
 
-													{{-- @foreach ($dataKk as $item)
+													@foreach ($dataKk as $item)
 					                                <tr>
                                                         <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
                                                         <td style="vertical-align: middle;">
@@ -164,7 +163,7 @@
                                                             @endif
                                                         </td>       
                                                         <td style="vertical-align: middle;">{{ $item->tahun_ajaran }}</td>     
-                                                        <td style="vertical-align: middle;">{{ $item->nis_siswa }}</td>                      
+                                                        <td style="vertical-align: middle;">{{ $item->nis_siswa }}</td>
 														<td class="table-action" style="vertical-align: middle;">
                                                             <div style="display:flex; align-items:center">
                                                                 <a style="margin-right: 10px;" href="{{ route( 'kenaikanKelas.edit', $item->id_kk) }}" class="btn btn-sm btn-warning">Edit</a>
@@ -176,7 +175,7 @@
                                                             </div>													
 														</td>
 					                                </tr>
-													@endforeach --}}
+													@endforeach
 													<script>
 														function confirmDelete(menuId) {
 															if (confirm('Are you sure you want to delete this item?')) {
@@ -192,9 +191,9 @@
 					                            </tbody>
 					                        </table>
 					                    </div>
-                                        {{ $dataKk->links('pagination::bootstrap-4') }}
+                                        {{ $dataKk->appends(['search' => $search, 'sekolah_filter' => $sekolahFilter, 'tahun_ajaran_filter' => $tahunAjaranFilter])->links('pagination::bootstrap-4') }}
+                                
 					                    <hr class="new-section-xs">
-					                    
 					                </div>
 					                <!--===================================================-->
 					                <!--End Data Table-->

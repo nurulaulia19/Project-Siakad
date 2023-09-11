@@ -3,22 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
+use App\Models\Kelas;
 use App\Models\Sekolah;
 use App\Models\DataUser;
 use App\Models\RoleMenu;
 use App\Models\Data_Menu;
 use Illuminate\Http\Request;
 use App\Models\DataPelajaran;
+use App\Models\GuruPelajaran;
 use Illuminate\Support\Facades\DB;
 
-class DataPelajaranController extends Controller
+class GuruPelajaranController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $dataPelajaran = DataPelajaran::with('sekolah')->orderBy('kode_pelajaran', 'DESC')->paginate(10);
+        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->orderBy('id_gp', 'DESC')->paginate(10);
 
         // menu
         $user_id = auth()->user()->user_id;
@@ -55,25 +57,25 @@ class DataPelajaranController extends Controller
             ];
             
     }
-    return view('mapel.index', compact('dataPelajaran','menuItemsWithSubmenus'));
+    return view('guruMapel.index', compact('dataGp','menuItemsWithSubmenus'));
 }
-
-    
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
+        $dataGp = GuruPelajaran::all();
         $dataPelajaran = DataPelajaran::all();
         // $dataUser = DataUser::all();
         $guruRoleId = Role::where('role_name', 'guru')->value('role_id'); // Mendapatkan ID peran "guru"
 
-        // $dataUser = DataUser::whereHas('role', function ($query) use ($guruRoleId) {
-        //     $query->where('role_id', $guruRoleId);
-        // })->get();
+        $dataUser = DataUser::whereHas('role', function ($query) use ($guruRoleId) {
+            $query->where('role_id', $guruRoleId);
+        })->get();
 
         $dataSekolah = Sekolah::all();
+        $dataKelas = Kelas::all();
 
         // MENU
         $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
@@ -101,7 +103,7 @@ class DataPelajaranController extends Controller
                     'subMenus' => $subMenus,
                 ];
             }
-        return view('mapel.create', compact('dataPelajaran','dataSekolah','menuItemsWithSubmenus'));
+        return view('guruMapel.create', compact('dataGp','dataUser','dataPelajaran','dataKelas','dataSekolah','menuItemsWithSubmenus'));
     }
 
     /**
@@ -109,14 +111,32 @@ class DataPelajaranController extends Controller
      */
     public function store(Request $request)
     {
-        $dataPelajaran = new DataPelajaran;
-        $dataPelajaran->kode_pelajaran = $request->kode_pelajaran;
-        $dataPelajaran->nama_pelajaran = $request->nama_pelajaran;
-        // $dataPelajaran->user_id = $request->user_id;
-        $dataPelajaran->id_sekolah = $request->id_sekolah;
-        $dataPelajaran->save();
+        $dataGp = new GuruPelajaran;
+        $dataGp->id_sekolah = $request->id_sekolah;
+        $dataGp->id_pelajaran = $request->id_pelajaran;
+        $dataGp->id_kelas = $request->id_kelas;
+        $dataGp->user_id = $request->user_id;
+        $dataGp->tahun_ajaran = $request->tahun_ajaran;
+        $dataGp->save();
 
-        return redirect()->route('mapel.index')->with('success', 'Mata Pelajaran insert successfully');
+        return redirect()->route('guruMapel.index')->with('success', 'Guru Mata Pelajaran insert successfully');
+
+        // $id_pelajaran = $request->id_pelajaran;
+        //  // Inisialisasi string kosong
+
+        // // Looping melalui array 'nis_siswa' dan menggabungkannya menjadi satu string dengan koma sebagai pemisah
+        // foreach ($id_pelajaran as $mapel) {
+        //     $dataGp = new GuruPelajaran();
+        //     $dataGp->id_sekolah = $request->id_sekolah;
+        //     $dataGp->id_kelas = $request->id_kelas;
+        //     $dataGp->tahun_ajaran = $request->tahun_ajaran;
+        //     $dataGp->user_id = $request->user_id;
+        //     $dataGp->id_pelajaran = $mapel;
+            
+        //     $dataGp->save();
+        // }
+        //         return redirect()->route('guruMapel.index')->with('success', 'Guru Mata Pelajaran insert successfully');
+            
     }
 
     /**
@@ -130,18 +150,22 @@ class DataPelajaranController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id_pelajaran)
+    public function edit($id_gp)
     {
+        
         $dataSekolah = Sekolah::all();
-        // $dataUser = DataUser::all();
+       
+        $guruRoleId = Role::where('role_name', 'guru')->value('role_id'); // Mendapatkan ID peran "guru"
 
-        // $guruRoleId = Role::where('role_name', 'guru')->value('role_id'); // Mendapatkan ID peran "guru"
-
-        // $dataUser = DataUser::whereHas('role', function ($query) use ($guruRoleId) {
-        //     $query->where('role_id', $guruRoleId);
-        // })->get();
-
-        $dataPelajaran = DataPelajaran::where('id_pelajaran', $id_pelajaran)->first();
+        $dataUser = DataUser::whereHas('role', function ($query) use ($guruRoleId) {
+            $query->where('role_id', $guruRoleId);
+        })->get();
+        $selectedMapelId = GuruPelajaran::where('id_gp', $id_gp)->pluck('id_pelajaran')->toArray();
+        // $selectedMapelId = PelajaranKelas::where('id_pk', $id_pk)->first()->id_pelajaran;
+        $dataGp = GuruPelajaran::where('id_gp', $id_gp)->first();
+        $dataPelajaran = DataPelajaran::where('id_sekolah', $dataGp->id_sekolah)->get();
+        $dataKelas = Kelas::where('id_sekolah', $dataGp->id_sekolah)->get();
+        
     
         // MENU
         $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
@@ -169,33 +193,43 @@ class DataPelajaranController extends Controller
                         'subMenus' => $subMenus,
                     ];
                 }
-        return view('mapel.update', compact('dataPelajaran', 'dataSekolah', 'menuItemsWithSubmenus'));
+        return view('guruMapel.update', compact('dataGp','dataSekolah','dataKelas','dataUser','dataPelajaran','menuItemsWithSubmenus','selectedMapelId'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id_pelajaran)
+    public function update(Request $request, $id_gp)
     {
-        DB::table('data_pelajaran')->where('id_pelajaran', $id_pelajaran)->update([
+        DB::table('data_guru_pelajaran')->where('id_gp', $id_gp)->update([
             'nama_pelajaran' => $request->nama_pelajaran,
-            'kode_pelajaran' => $request->kode_pelajaran,
-            // 'user_id' => $request->user_id,
+            'id_pelajaran' => $request->id_pelajaran,
+            'user_id' => $request->user_id,
             'id_sekolah' => $request->id_sekolah,
+            'tahun_ajaran' => $request->tahun_ajaran,
             'created_at' => now(),
             'updated_at' => now()
 
     ]);
 
-    return redirect()->route('mapel.index')->with('success', 'Mata Pelajaran edited successfully');
+    return redirect()->route('guruMapel.index')->with('success', 'Guru Mata Pelajaran edited successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id_pelajaran){
-        $dataPelajaran = DataPelajaran::where('id_pelajaran', $id_pelajaran);
-        $dataPelajaran->delete();
-        return redirect()->route('mapel.index')->with('success', 'Terdelet');
+    public function destroy(string $id)
+    {
+        //
+    }
+
+    public function getKelas(Request $request){
+        $kelas = Kelas::where('id_sekolah', $request->sekolahID)->pluck('id_kelas', 'nama_kelas');
+        return response()->json($kelas);
+    }
+
+    public function getMapel(Request $request){
+        $mapel = DataPelajaran::where('id_sekolah', $request->sekolahID)->pluck('id_pelajaran', 'nama_pelajaran');
+        return response()->json($mapel);
     }
 }

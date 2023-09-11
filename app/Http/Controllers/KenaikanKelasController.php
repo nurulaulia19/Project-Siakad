@@ -60,7 +60,35 @@ class KenaikanKelasController extends Controller
         $tahunAjaranFilter = $request->input('tahun_ajaran_filter');
 
         // Query database sesuai dengan pencarian, filter sekolah, dan filter tahun ajaran
-        $dataKk = KenaikanKelas::query()
+        // $dataKk = KenaikanKelas::query()
+        //     ->when(isset($search), function ($query) use ($search) {
+        //         $query->where('nis_siswa', 'LIKE', '%' . $search . '%');
+        //     })
+        //     ->when(isset($sekolahFilter) && !empty($sekolahFilter), function ($query) use ($sekolahFilter) {
+        //         $query->where('id_sekolah', $sekolahFilter);
+        //     })
+        //     ->when(isset($tahunAjaranFilter) && !empty($tahunAjaranFilter), function ($query) use ($tahunAjaranFilter) {
+        //         $query->where('tahun_ajaran', $tahunAjaranFilter);
+        //     })
+        //     ->groupBy('id_sekolah', 'id_kelas', 'tahun_ajaran')
+        //     ->orderBy('id_kk', 'desc')
+        //     ->paginate(2);
+
+        // $dataKk = KenaikanKelas::when(isset($search), function ($query) use ($search) {
+        //     $query->where('nis_siswa', 'LIKE', '%' . $search . '%');
+        // })
+        // ->when(isset($sekolahFilter) && !empty($sekolahFilter), function ($query) use ($sekolahFilter) {
+        //     $query->where('id_sekolah', $sekolahFilter);
+        // })
+        // ->when(isset($tahunAjaranFilter) && !empty($tahunAjaranFilter), function ($query) use ($tahunAjaranFilter) {
+        //     $query->where('tahun_ajaran', $tahunAjaranFilter);
+        // })
+        // ->select('id_sekolah', 'id_kelas', 'tahun_ajaran', DB::raw('MAX(nis_siswa) as nis_siswa'))
+        // ->groupBy('id_sekolah', 'id_kelas', 'tahun_ajaran')
+        // ->orderBy('id_kk', 'desc')
+        // ->paginate(2);
+
+        $dataKk = KenaikanKelas::orderBy('id_kk', 'desc')
             ->when(isset($search), function ($query) use ($search) {
                 $query->where('nis_siswa', 'LIKE', '%' . $search . '%');
             })
@@ -70,23 +98,22 @@ class KenaikanKelasController extends Controller
             ->when(isset($tahunAjaranFilter) && !empty($tahunAjaranFilter), function ($query) use ($tahunAjaranFilter) {
                 $query->where('tahun_ajaran', $tahunAjaranFilter);
             })
-            ->orderBy('id_kk', 'desc')
+            ->select('id_sekolah', 'id_kelas', 'tahun_ajaran', DB::raw('GROUP_CONCAT(id_kk, ", ") as id_kk'), DB::raw('GROUP_CONCAT(nis_siswa SEPARATOR ", ") as nis_siswa'))
+            ->groupBy('id_sekolah', 'id_kelas', 'tahun_ajaran')
             ->paginate(10);
 
+
+            // dd($dataKk);
+
         // Inisialisasi array untuk mengelompokkan data
-        $groupedData = [];
+        // $groupedData = [];
 
-        foreach ($dataKk as $item) {
-            $groupedData[$item->id_sekolah][$item->id_kelas][$item->tahun_ajaran][] = $item;
-        }
-
-        
-
-
-
-
+        // foreach ($dataKk as $item) {
+        //     $groupedData[$item->id_sekolah][$item->id_kelas][$item->tahun_ajaran][] = $item;
+        // }
 
         
+
         // sidebar menu
         $user_id = auth()->user()->user_id;
         $user = DataUser::findOrFail($user_id);
@@ -123,7 +150,7 @@ class KenaikanKelasController extends Controller
         }
 
 
-        return view('kenaikanKelas.index', compact('dataKk','menuItemsWithSubmenus','groupedData','dataSekolah','tahunAjarans','sekolahFilter','tahunAjaranFilter'));
+        return view('kenaikanKelas.index', compact('dataKk','menuItemsWithSubmenus','dataSekolah','tahunAjarans','sekolahFilter','tahunAjaranFilter','search'));
     }
 
     /**
