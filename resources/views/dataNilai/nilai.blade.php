@@ -15,7 +15,7 @@
                 <div id="page-head">         
 					<div class="pad-all text-center">
 						<h3>Welcome back to the Dashboard</h3>
-						<p>This is your experience to manage the Laundry Application</p>
+						<p>This is your experience to manage the Sistem Informasi Akademik Application</p>
 					</div>
                 </div>  
                 <!--Page content-->
@@ -25,33 +25,32 @@
 					        <div class="col-xs-12">
 					            <div class="panel">
 					                <div class="panel-heading">
-					                    <h3 class="panel-title">Data Guru Mata Pelajaran</h3>
+					                    <h3 class="panel-title">Data Nilai</h3>
 					                </div>
 					
 					                <!--Data Table-->
 					                <!--===================================================-->
 					                <div class="panel-body">
-					                    <div class="pad-btm form-inline">
+					                    {{-- <div class="pad-btm form-inline">
 					                        <div class="row">
 					                            <div class="col-sm-6 table-toolbar-left">
-													<a href="{{ route('guruMapel.create') }}" class="btn btn-purple">
+													<a href="{{ route('dataNilai.create') }}" class="btn btn-purple">
 														<i class="demo-pli-add icon-fw"></i>Add
 													</a>
 													
 					                            </div>
 					                        </div>
-					                    </div>
+					                    </div> --}}
 					                    <div class="table-responsive">
 					                        <table class="table table-striped">
 					                            <thead>
 					                                <tr>
                                                         <th>No</th>
-                                                        <th>Nama Sekolah</th>
                                                         <th>Nama Kelas</th>
+					                                    <th>Nama Sekolah</th>
                                                         <th>Tahun Ajaran</th>
                                                         <th>Mata Pelajaran</th>
                                                         <th>Nama Guru</th>
-                                                        <th>Jadwal</th>
 					                                </tr>
 					                            </thead>
 					                            <tbody>
@@ -60,19 +59,19 @@
 					                                <tr>
                                                         <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
                                                         <td style="vertical-align: middle;">
-                                                            @if ($item->sekolah)
-                                                                {{ $item->sekolah->nama_sekolah }}
-                                                            @else
-                                                                Nama Sekolah not assigned
-                                                            @endif
-                                                        </td>  
-                                                        <td style="vertical-align: middle;">
                                                             @if ($item->kelas)
                                                                 {{ $item->kelas->nama_kelas }}
                                                             @else
                                                                 Nama Kelas not assigned
                                                             @endif
-                                                        </td>  
+                                                        </td>
+                                                        <td style="vertical-align: middle;">
+                                                            @if ($item->sekolah)
+                                                                {{ $item->sekolah->nama_sekolah }}
+                                                            @else
+                                                                Nama Sekolah not assigned
+                                                            @endif
+                                                        </td>    
                                                         {{-- <td> @foreach ($item->mapelList as $mapelList)
 															{{ $mapelList->sekolah->nama_sekolah }}
 															@if (!$loop->last)
@@ -88,40 +87,17 @@
                                                             @else
                                                                 Nama Guru not assigned
                                                             @endif
-                                                        </td>
-                                                        {{-- <td style="vertical-align: middle;">
-                                                            @foreach ($item->guruMapelJadwal as $guruMapel)
-                                                                {{ $guruMapel->hari }} - {{ $guruMapel->jam_mulai }} to {{ $guruMapel->jam_selesai }}
-                                                                <br>
-                                                            @endforeach
-                                                        </td>                                        --}}
-                                                        <td style="vertical-align: middle;">
-                                                            @foreach ($item->guruMapelJadwal as $guruMapel)
-                                                                <a style="color: blue" href="{{ route('guruMapelJadwal.destroy', ['id_gpj' => $guruMapel->id_gpj]) }}" class="guru-mapel-link" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                                                                    {{ $guruMapel->hari }} - {{ $guruMapel->jam_mulai }} to {{ $guruMapel->jam_selesai }}
-                                                                </a>
-                                                                <br>
-                                                            @endforeach
-                                                        </td>                                                        
+                                                        </td>                                       
 														<td class="table-action" style="vertical-align: middle;">
                                                             <div style="display:flex; align-items:center">
-                                                                <a style="margin-right: 10px;" href="{{ route( 'guruMapel.edit', $item->id_gp) }}" class="btn btn-sm btn-warning">Edit</a>
-															<form method="POST" action="" id="delete-form-{{ $item->id_gp }}">
-																@csrf
-                												@method('DELETE')
-																<a href="/admin/guruMapel/destroy/{{ $item->id_gp }}" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $item->id_pk }})">Hapus</a>				
-															</form>	
-                                                            {{-- <a style="margin-left: 10px;" href="{{ route('guruMapel.jadwal') }}" class="btn btn-sm btn-success">Add Jadwal</a> --}}
-                                                            {{-- <button style="margin-left: 10px;" type="button" data-toggle="modal" data-id="{{ $item->id_gp }}" data-target="#modalJadwal" class="btn btn-sm btn-primary add-jadwal">Add Jadwal</button> --}}
-
-                                                            <button style="margin-left: 10px;" type="button" data-toggle="modal" data-id="{{ $item->id_gp }}" data-target="#modalJadwal" class="btn btn-sm btn-primary add-jadwal">Add Jadwal</button>
-                                                            </div>	
-                                                            @include('guruMapel.modalJadwal')												
+                                                                {{-- <a href="{{ route( 'guruMapel.edit', $item->id_gp) }}" class="btn btn-danger" style="margin-right: 10px;">
+                                                                    <i class="fas fa-heart" style="font-size: 18px;"></i>
+                                                                </a> --}}
+                                                                 <a style="margin-right: 10px;" href="{{ route( 'guruMapel.edit', $item->id_gp) }}" class="btn btn-sm btn-warning">Detail</a>
+                                                            </div>													
 														</td>
 					                                </tr>
 													@endforeach
-                                                    
-
 													<script>
 														function confirmDelete(menuId) {
 															if (confirm('Are you sure you want to delete this item?')) {
@@ -170,46 +146,6 @@
         </button>
         <!--===================================================-->
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- JavaScript -->
-    <script>
-        $(document).ready(function() {
-            // Ketika tombol "Add Jadwal" diklik
-            $(".add-jadwal").click(function () {
-                var id_gp = $(this).data('id'); // Mengambil nilai data-id dari tombol "Add Jadwal"
-                
-                // Sekarang Anda dapat menggunakan id_gp dalam modal
-                // Contoh: memasukkan id_gp ke input dengan ID "id_gp_modal"
-                $("#id_gp_modal").val(id_gp);
-                
-                // Menampilkan modal
-                $('#modalJadwal').modal('show');
-                
-                // Debugging: Cetak id_gp ke konsol
-                console.log("id_gp yang diambil:", id_gp);
-            });
-        });
-    </script>
-
-    {{-- <script>
-        $(document).ready(function () {
-            // Ketika tautan guruMapel diklik
-            $(".guru-mapel-link").click(function (e) {
-                e.preventDefault(); // Mencegah tautan dari navigasi
-
-                // Menampilkan konfirmasi hapus dengan dialog JavaScript
-                var konfirmasi = confirm("Apakah Anda yakin ingin menghapus data ini?");
-                if (konfirmasi) {
-                    // Jika pengguna menekan OK, tampilkan formulir hapus yang sesuai
-                    $(this).next(".hapus-form").show();
-                }
-            });
-        });
-    </script> --}}
-
-    
     <!--===================================================-->
     <!-- END OF CONTAINER -->
 @endsection

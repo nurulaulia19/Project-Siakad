@@ -210,8 +210,7 @@
 									'Data Mata Pelajaran' => 'fas fa-book',
 									'Data Siswa' => 'fas fa-users',
 									'Data Kenaikan Kelas' => 'fas fa-graduation-cap',
-
-									
+									'Data Nilai' => 'fas fa-chart-bar',
 								];
 
 							@endphp
@@ -251,23 +250,7 @@
 								@endif
 							</li>
 							@endforeach
-
-
-						
-
-								
 						</ul>
-
-
-
-
-							<!-- resources/views/layouts/sidebar.blade.php -->
-
-							<!-- sidebar.blade.php -->
-
-
-
-
 				</div>
 			</div>
 		</div>

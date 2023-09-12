@@ -11,6 +11,8 @@ use App\Models\Data_Menu;
 use Illuminate\Http\Request;
 use App\Models\DataPelajaran;
 use App\Models\GuruPelajaran;
+use App\Models\GuruPelajaranJadwal;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 class GuruPelajaranController extends Controller
@@ -20,7 +22,7 @@ class GuruPelajaranController extends Controller
      */
     public function index()
     {
-        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->orderBy('id_gp', 'DESC')->paginate(10);
+        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel','guruMapelJadwal')->orderBy('id_gp', 'DESC')->paginate(10);
 
         // menu
         $user_id = auth()->user()->user_id;
@@ -111,6 +113,25 @@ class GuruPelajaranController extends Controller
      */
     public function store(Request $request)
     {
+
+        $customMessages = [
+            'id_sekolah.unique' => 'Data sudah ada.'
+            // Add other custom error messages as needed
+        ];
+        
+        $validatedData = $request->validate([
+            'id_sekolah' => [
+                'required',
+                Rule::unique('data_guru_pelajaran')->where(function ($query) use ($request) {
+                    return $query->where('id_sekolah', $request->id_sekolah)
+                        ->where('id_kelas', $request->id_kelas)
+                        ->where('tahun_ajaran', $request->tahun_ajaran);
+                }),
+            ],
+            'id_kelas' => 'required',
+            'tahun_ajaran' => 'required',
+        ], $customMessages);
+        
         $dataGp = new GuruPelajaran;
         $dataGp->id_sekolah = $request->id_sekolah;
         $dataGp->id_pelajaran = $request->id_pelajaran;
@@ -118,24 +139,9 @@ class GuruPelajaranController extends Controller
         $dataGp->user_id = $request->user_id;
         $dataGp->tahun_ajaran = $request->tahun_ajaran;
         $dataGp->save();
+        
 
         return redirect()->route('guruMapel.index')->with('success', 'Guru Mata Pelajaran insert successfully');
-
-        // $id_pelajaran = $request->id_pelajaran;
-        //  // Inisialisasi string kosong
-
-        // // Looping melalui array 'nis_siswa' dan menggabungkannya menjadi satu string dengan koma sebagai pemisah
-        // foreach ($id_pelajaran as $mapel) {
-        //     $dataGp = new GuruPelajaran();
-        //     $dataGp->id_sekolah = $request->id_sekolah;
-        //     $dataGp->id_kelas = $request->id_kelas;
-        //     $dataGp->tahun_ajaran = $request->tahun_ajaran;
-        //     $dataGp->user_id = $request->user_id;
-        //     $dataGp->id_pelajaran = $mapel;
-            
-        //     $dataGp->save();
-        // }
-        //         return redirect()->route('guruMapel.index')->with('success', 'Guru Mata Pelajaran insert successfully');
             
     }
 
@@ -202,7 +208,7 @@ class GuruPelajaranController extends Controller
     public function update(Request $request, $id_gp)
     {
         DB::table('data_guru_pelajaran')->where('id_gp', $id_gp)->update([
-            'nama_pelajaran' => $request->nama_pelajaran,
+            'id_kelas' => $request->id_kelas,
             'id_pelajaran' => $request->id_pelajaran,
             'user_id' => $request->user_id,
             'id_sekolah' => $request->id_sekolah,
@@ -218,9 +224,12 @@ class GuruPelajaranController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy($id_gp){
+        $dataGp = GuruPelajaran::where('id_gp', $id_gp);
+        $dataGp->delete();
+        $dataGpj = GuruPelajaranJadwal::where('id_gp', $id_gp);
+        $dataGpj->delete();
+        return redirect()->route('guruMapel.index')->with('success', 'Terdelet');
     }
 
     public function getKelas(Request $request){
@@ -232,4 +241,52 @@ class GuruPelajaranController extends Controller
         $mapel = DataPelajaran::where('id_sekolah', $request->sekolahID)->pluck('id_pelajaran', 'nama_pelajaran');
         return response()->json($mapel);
     }
+
+    public function nilai() {
+        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->orderBy('id_gp', 'DESC')->paginate(10);
+
+        // menu
+        $user_id = auth()->user()->user_id;
+        $user = DataUser::findOrFail($user_id);
+        $menu_ids = $user->role->roleMenus->pluck('menu_id');
+
+        $menu_route_name = request()->route()->getName(); // Nama route dari URL yang diminta
+
+        // Ambil menu berdasarkan menu_link yang sesuai dengan nama route
+        $requested_menu = Data_Menu::where('menu_link', $menu_route_name)->first();
+        // dd($requested_menu);
+
+        // Periksa izin akses berdasarkan menu_id dan user_id
+        if (!$requested_menu || !$menu_ids->contains($requested_menu->menu_id)) {
+            return redirect()->back()->with('error', 'You do not have permission to access this menu.');
+        }
+
+        $mainMenus = Data_Menu::where('menu_category', 'master menu')
+            ->whereIn('menu_id', $menu_ids)
+            ->get();
+
+        $menuItemsWithSubmenus = [];
+
+        foreach ($mainMenus as $mainMenu) {
+            $subMenus = Data_Menu::where('menu_sub', $mainMenu->menu_id)
+                ->where('menu_category', 'sub menu')
+                ->whereIn('menu_id', $menu_ids)
+                ->orderBy('menu_position')
+                ->get();
+
+            $menuItemsWithSubmenus[] = [
+                'mainMenu' => $mainMenu,
+                'subMenus' => $subMenus,
+            ];
+            
+    }
+    return view('dataNilai.nilai', compact('dataGp','menuItemsWithSubmenus'));
+    }
+
+//     public function tampilkanForm()
+// {
+//     // Di sini Anda dapat menyiapkan data yang diperlukan untuk form
+//     return view('guruMapel.jadwal');
+// }
+
 }

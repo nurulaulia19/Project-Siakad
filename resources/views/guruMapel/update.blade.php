@@ -80,6 +80,19 @@
                                             <label class="col-sm-3 control-label" for="id_pelajaran">Nama Pelajaran</label>
                                             <div class="col-sm-9">
                                                 <select name="id_pelajaran" id="id_pelajaran" class="form-control">
+                                                    @foreach ($dataPelajaran as $item)
+                                                    <option value="{{ $item->id_pelajaran }}" {{ $item->id_pelajaran == $dataGp->id_pelajaran ? 'selected' : '' }}>
+                                                        {{ $item->nama_pelajaran }}
+                                                    </option>
+                                                    @endforeach
+                                                    
+                                                </select>
+                                            </div>
+                                        </div>
+                                        {{-- <div class="form-group d-flex mb-3">
+                                            <label class="col-sm-3 control-label" for="id_pelajaran">Nama Pelajaran</label>
+                                            <div class="col-sm-9">
+                                                <select name="id_pelajaran" id="id_pelajaran" class="form-control">
                                                     <option disabled selected>Pilih Mata Pelajaran</option>
                                                 </select>
                                                 @error('id_pelajaran')
@@ -88,7 +101,7 @@
                                                 </span>
                                                 @enderror
                                             </div>
-                                        </div>
+                                        </div> --}}
                                        <div class="form-group d-flex mb-3">
                                             <label class="col-sm-3 control-label" for="user_id">Nama Guru</label>
                                             <div class="col-sm-9">

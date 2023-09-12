@@ -39,6 +39,11 @@ class GuruPelajaran extends Model
         return $this->belongsTo(DataUser::class, 'user_id', 'user_id');
     }
 
+    public function guruMapelJadwal()
+    {
+        return $this->hasMany(GuruPelajaranJadwal::class, 'id_gp', 'id_gp');
+    }
+
     // public function mapelList()
     // {
     //     return $this->hasMany(PelajaranKelasList::class, 'id_pk', 'id_pk')->with('sekolah', 'mapel');

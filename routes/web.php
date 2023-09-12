@@ -24,6 +24,8 @@ use App\Http\Controllers\DataPelajaranController;
 use App\Http\Controllers\DataSiswaController;
 use App\Http\Controllers\DataTokoController;
 use App\Http\Controllers\GuruPelajaranController;
+use App\Http\Controllers\GuruPelajaranJadwalController;
+use App\Http\Controllers\KategoriNilaiController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KenaikanKelasController;
 use App\Http\Controllers\MapelController;
@@ -203,10 +205,19 @@ Route::get('/admin/guruMapel', [GuruPelajaranController::class,'index'])->name('
 Route::get('/admin/guruMapel/edit/{id}', [GuruPelajaranController::class, 'edit'])->name('guruMapel.edit');
 Route::post('/guruMapel/store', [GuruPelajaranController::class, 'store']);
 Route::get('/admin/guruMapel/destroy/{id}', [GuruPelajaranController::class,'destroy'])->name('guruMapel.destroy');
-
-
 Route::get('/admin/guruMapel/getKelas', [GuruPelajaranController::class, 'getKelas'])->name('guruMapel.getKelas');
 Route::get('/admin/guruMapel/getMapel', [GuruPelajaranController::class, 'getMapel'])->name('guruMapel.getMapel');
 
+Route::get('/admin/guruMapel/nilai', [GuruPelajaranController::class,'nilai'])->name('dataNilai.nilai');
 
+// guru pelajaran jadwal
+Route::post('/admin/guruMapelJadwal/store', [GuruPelajaranJadwalController::class, 'store'])->name('guruMapelJadwal.store');
+Route::get('/admin/guruMapelJadwal/destroy/{id_gpj}', [GuruPelajaranJadwalController::class, 'destroy'])->name('guruMapelJadwal.destroy');
 
+// ketegori nilai
+Route::put('/admin/kategoriNilai/update/{id}', [KategoriNilaiController::class, 'update'])->name('kategoriNilai.update');
+Route::get('/admin/kategoriNilai/create', [KategoriNilaiController::class, 'create'])->name('kategoriNilai.create');
+Route::get('/admin/kategoriNilai', [KategoriNilaiController::class,'index'])->name('kategoriNilai.index');
+Route::get('/admin/kategoriNilai/edit/{id}', [KategoriNilaiController::class, 'edit'])->name('kategoriNilai.edit');
+Route::post('/kategoriNilai/store', [KategoriNilaiController::class, 'store']);
+Route::get('/admin/kategoriNilai/destroy/{id}', [KategoriNilaiController::class,'destroy'])->name('kategoriNilai.destroy');
