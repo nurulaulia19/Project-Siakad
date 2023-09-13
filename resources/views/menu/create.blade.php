@@ -17,7 +17,7 @@
                 <div id="page-head">         
 					<div class="pad-all text-center">
 						<h3>Welcome back to the Dashboard</h3>
-						<p>This is your experience to manage the Laundry Application</p>
+						<p>This is your experience to manage the Sistem Informasi Akademik Application</p>
 					</div>
                     </div>  
                 <!--Page content-->

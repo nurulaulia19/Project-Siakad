@@ -15,7 +15,7 @@
                 <div id="page-head">         
 					<div class="pad-all text-center">
 						<h3>Welcome back to the Dashboard</h3>
-						<p>This is your experience to manage the Laundry Application</p>
+						<p>This is your experience to manage the Sistem Informasi Akademik Application</p>
 					</div>
                 </div>  
                 <!--Page content-->
@@ -144,7 +144,9 @@
 					                            </tbody>
 					                        </table>
 					                    </div>
-                                        {{ $dataSiswaList->links('pagination::bootstrap-4') }}
+                                        {{ $dataSiswaList->appends(['search' => $searchTerm, 'tahun_filter' => $selectedYear,])->links('pagination::bootstrap-4') }}
+                                        
+                                        {{-- {{ $dataSiswaList->links('pagination::bootstrap-4') }} --}}
 					                    <hr class="new-section-xs">
 					                    
 					                </div>

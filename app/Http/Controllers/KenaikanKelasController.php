@@ -21,73 +21,13 @@ class KenaikanKelasController extends Controller
      */
     public function index(Request $request)
     {
-        // $dataKk = KenaikanKelas::orderBy('id_kk', 'desc');
-
-        // $dataSekolah = Sekolah::all();
-        // $tahunAjarans = KenaikanKelas::distinct()->pluck('tahun_ajaran');
-        // $search = $request->input('search');
-        // $sekolahFilter = $request->input('sekolah_filter'); // Mendapatkan nilai filter sekolah dari permintaan
-        // $tahunAjaranFilter = $request->input('tahun_ajaran_filter'); 
-    
-        //     if (isset($search)) {
-        //         $dataKk->where('nis_siswa', 'LIKE', '%' . $search . '%');
-        //     }
-            
-        //     if (isset($sekolahFilter) && !empty($sekolahFilter)) {
-        //         $dataKk->where('id_sekolah', $sekolahFilter);
-        //     }
-            
-        //     if (isset($tahunAjaranFilter) && !empty($tahunAjaranFilter)) {
-        //         $dataKk->where('tahun_ajaran', $tahunAjaranFilter);
-        //     }
-        
-
-       
-        // $dataKk = $dataKk->paginate(10);
-
-        // // Inisialisasi array untuk mengelompokkan data
-        // $groupedData = [];
-
-        // foreach ($dataKk as $item) {
-        //     $groupedData[$item->id_sekolah][$item->id_kelas][$item->tahun_ajaran][] = $item;
-        // }
-
-       
         $dataSekolah = Sekolah::all();
         $tahunAjarans = KenaikanKelas::distinct()->pluck('tahun_ajaran');
         $search = $request->input('search');
         $sekolahFilter = $request->input('sekolah_filter');
         $tahunAjaranFilter = $request->input('tahun_ajaran_filter');
 
-        // Query database sesuai dengan pencarian, filter sekolah, dan filter tahun ajaran
-        // $dataKk = KenaikanKelas::query()
-        //     ->when(isset($search), function ($query) use ($search) {
-        //         $query->where('nis_siswa', 'LIKE', '%' . $search . '%');
-        //     })
-        //     ->when(isset($sekolahFilter) && !empty($sekolahFilter), function ($query) use ($sekolahFilter) {
-        //         $query->where('id_sekolah', $sekolahFilter);
-        //     })
-        //     ->when(isset($tahunAjaranFilter) && !empty($tahunAjaranFilter), function ($query) use ($tahunAjaranFilter) {
-        //         $query->where('tahun_ajaran', $tahunAjaranFilter);
-        //     })
-        //     ->groupBy('id_sekolah', 'id_kelas', 'tahun_ajaran')
-        //     ->orderBy('id_kk', 'desc')
-        //     ->paginate(2);
-
-        // $dataKk = KenaikanKelas::when(isset($search), function ($query) use ($search) {
-        //     $query->where('nis_siswa', 'LIKE', '%' . $search . '%');
-        // })
-        // ->when(isset($sekolahFilter) && !empty($sekolahFilter), function ($query) use ($sekolahFilter) {
-        //     $query->where('id_sekolah', $sekolahFilter);
-        // })
-        // ->when(isset($tahunAjaranFilter) && !empty($tahunAjaranFilter), function ($query) use ($tahunAjaranFilter) {
-        //     $query->where('tahun_ajaran', $tahunAjaranFilter);
-        // })
-        // ->select('id_sekolah', 'id_kelas', 'tahun_ajaran', DB::raw('MAX(nis_siswa) as nis_siswa'))
-        // ->groupBy('id_sekolah', 'id_kelas', 'tahun_ajaran')
-        // ->orderBy('id_kk', 'desc')
-        // ->paginate(2);
-
+        
         $dataKk = KenaikanKelas::orderBy('id_kk', 'desc')
             ->when(isset($search), function ($query) use ($search) {
                 $query->where('nis_siswa', 'LIKE', '%' . $search . '%');
@@ -101,16 +41,6 @@ class KenaikanKelasController extends Controller
             ->select('id_sekolah', 'id_kelas', 'tahun_ajaran', DB::raw('GROUP_CONCAT(id_kk, ", ") as id_kk'), DB::raw('GROUP_CONCAT(nis_siswa SEPARATOR ", ") as nis_siswa'))
             ->groupBy('id_sekolah', 'id_kelas', 'tahun_ajaran')
             ->paginate(10);
-
-
-            // dd($dataKk);
-
-        // Inisialisasi array untuk mengelompokkan data
-        // $groupedData = [];
-
-        // foreach ($dataKk as $item) {
-        //     $groupedData[$item->id_sekolah][$item->id_kelas][$item->tahun_ajaran][] = $item;
-        // }
 
         
 
@@ -215,6 +145,7 @@ class KenaikanKelasController extends Controller
             ],
             'id_kelas' => 'required',
             'tahun_ajaran' => 'required',
+            'nis_siswa' => 'required',
         ], $customMessages);
         
 
@@ -294,6 +225,10 @@ class KenaikanKelasController extends Controller
      */
     public function update(Request $request, $id_kk)
     {
+
+        $validatedData = $request->validate([
+            'nis_siswa' => 'required',
+        ]);
         // Hapus data yang sesuai dengan id_kk yang diberikan
         // KenaikanKelas::where('id_kk', $id_kk)->delete();
         $dataKk = KenaikanKelas::where('id_kk', $id_kk)->first();
@@ -302,7 +237,7 @@ class KenaikanKelasController extends Controller
             ->where('tahun_ajaran', $dataKk->tahun_ajaran)
             ->delete();
         
-    
+
         // Loop melalui nis_siswa yang ada dalam permintaan
         foreach ($request->nis_siswa as $nis) {
             // Lakukan operasi INSERT pada tabel data_kenaikan_kelas

@@ -125,7 +125,9 @@ class GuruPelajaranController extends Controller
                 Rule::unique('data_guru_pelajaran')->where(function ($query) use ($request) {
                     return $query->where('id_sekolah', $request->id_sekolah)
                         ->where('id_kelas', $request->id_kelas)
-                        ->where('tahun_ajaran', $request->tahun_ajaran);
+                        ->where('tahun_ajaran', $request->tahun_ajaran)
+                        ->where('id_pelajaran', $request->id_pelajaran)
+                        ->where('user_id', $request->user_id);
                 }),
             ],
             'id_kelas' => 'required',
@@ -207,6 +209,27 @@ class GuruPelajaranController extends Controller
      */
     public function update(Request $request, $id_gp)
     {
+        
+        $customMessages = [
+            'id_sekolah.unique' => 'Data sudah ada.'
+            // Add other custom error messages as needed
+        ];
+        
+        $validatedData = $request->validate([
+            'id_sekolah' => [
+                'required',
+                Rule::unique('data_guru_pelajaran')->ignore($id_gp, 'id_gp')->where(function ($query) use ($request) {
+                    return $query->where('id_sekolah', $request->id_sekolah)
+                        ->where('id_kelas', $request->id_kelas)
+                        ->where('tahun_ajaran', $request->tahun_ajaran)
+                        ->where('id_pelajaran', $request->id_pelajaran)
+                        ->where('user_id', $request->user_id);
+                }),
+            ],
+            'id_kelas' => 'required',
+            'tahun_ajaran' => 'required',
+        ], $customMessages);
+
         DB::table('data_guru_pelajaran')->where('id_gp', $id_gp)->update([
             'id_kelas' => $request->id_kelas,
             'id_pelajaran' => $request->id_pelajaran,

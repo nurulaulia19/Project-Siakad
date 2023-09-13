@@ -88,7 +88,7 @@ class DataSiswaController extends Controller
         }
 
 
-        return view('siswa.index', compact('menuItemsWithSubmenus','tahunList','dataSiswaList','selectedYear'));
+        return view('siswa.index', compact('menuItemsWithSubmenus','tahunList','dataSiswaList','selectedYear','searchTerm'));
     }
 
     /**

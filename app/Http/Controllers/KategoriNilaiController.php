@@ -8,6 +8,7 @@ use App\Models\RoleMenu;
 use App\Models\Data_Menu;
 use Illuminate\Http\Request;
 use App\Models\KategoriNilai;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 class KategoriNilaiController extends Controller
@@ -99,7 +100,22 @@ class KategoriNilaiController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $customMessages = [
+            'id_sekolah.unique' => 'Data sudah ada.'
+            // Add other custom error messages as needed
+        ];
+
+        $validatedData = $request->validate([
+            'id_sekolah' => [
+                'required',
+                Rule::unique('data_kategori_nilai')->where(function ($query) use ($request) {
+                    return $query->where('id_sekolah', $request->id_sekolah)
+                        ->where('kategori', $request->kategori);
+                }),
+            ],
+            'kategori' => 'required',
+        ], $customMessages);
+
         $dataKn = new KategoriNilai;
         $dataKn->id_sekolah = $request->id_sekolah;
         $dataKn->kategori = $request->kategori;
@@ -161,6 +177,21 @@ class KategoriNilaiController extends Controller
      */
     public function update(Request $request, $id_kn)
     {
+         $customMessages = [
+            'id_sekolah.unique' => 'Data sudah ada.'
+            // Add other custom error messages as needed
+        ];
+
+        $validatedData = $request->validate([
+            'id_sekolah' => [
+                'required',
+                Rule::unique('data_kategori_nilai')->ignore($id_kn, 'id_kn')->where(function ($query) use ($request) {
+                    return $query->where('id_sekolah', $request->id_sekolah)
+                        ->where('kategori', $request->kategori);
+                }),
+            ],
+            'kategori' => 'required',
+        ], $customMessages);
          
         DB::table('data_kategori_nilai')->where('id_kn', $id_kn)->update([
             'id_sekolah' => $request->id_sekolah,

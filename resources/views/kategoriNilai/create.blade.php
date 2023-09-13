@@ -44,7 +44,11 @@
                                                         <option value="{{ $item->id_sekolah }}">{{ $item->nama_sekolah }}</option>
                                                     @endforeach
                                                 </select>
-                                                <span id="namasekolahError" class="error-message"></span>
+                                                @error('id_sekolah')
+                                                <span class="alert text-danger">
+                                                    {{ $message }}
+                                                </span>
+                                                @enderror
                                             </div>
                                         </div>
                                         
@@ -52,12 +56,16 @@
                                             <label class="col-sm-3 control-label" for="kategori">Kategori Nilai</label>
                                             <div class="col-sm-9">
                                                 <input type="text" placeholder="Kategori Nilai" name="kategori" id="kategori" class="form-control">
-                                                <span id="namakategoriError" class="error-message"></span>
+                                                @error('kategori')
+                                                <span class="alert text-danger">
+                                                    {{ $message }}
+                                                </span>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
                                     <div class="panel-footer text-right">
-                                        <a href="{{ route('kelas.index') }}" class="btn btn-secondary">KEMBALI</a>
+                                        <a href="{{ route('kategoriNilai.index') }}" class="btn btn-secondary">KEMBALI</a>
                                         <button type="submit" onclick="validateForm(event)" class="btn btn-primary">SIMPAN</button>
                                     </div>
                                 </form>

@@ -75,8 +75,6 @@
 														</td>
 					                                </tr>
 													@endforeach
-                                                    
-
 													<script>
 														function confirmDelete(menuId) {
 															if (confirm('Are you sure you want to delete this item?')) {
