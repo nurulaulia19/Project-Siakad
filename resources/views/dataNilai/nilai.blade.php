@@ -46,8 +46,8 @@
 					                            <thead>
 					                                <tr>
                                                         <th>No</th>
-                                                        <th>Nama Kelas</th>
 					                                    <th>Nama Sekolah</th>
+                                                        <th>Nama Kelas</th>
                                                         <th>Tahun Ajaran</th>
                                                         <th>Mata Pelajaran</th>
                                                         <th>Nama Guru</th>
@@ -59,26 +59,19 @@
 					                                <tr>
                                                         <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
                                                         <td style="vertical-align: middle;">
-                                                            @if ($item->kelas)
-                                                                {{ $item->kelas->nama_kelas }}
-                                                            @else
-                                                                Nama Kelas not assigned
-                                                            @endif
-                                                        </td>
-                                                        <td style="vertical-align: middle;">
                                                             @if ($item->sekolah)
                                                                 {{ $item->sekolah->nama_sekolah }}
                                                             @else
                                                                 Nama Sekolah not assigned
                                                             @endif
                                                         </td>    
-                                                        {{-- <td> @foreach ($item->mapelList as $mapelList)
-															{{ $mapelList->sekolah->nama_sekolah }}
-															@if (!$loop->last)
-																,
-															@endif
-															@endforeach
-														</td>  --}}
+                                                        <td style="vertical-align: middle;">
+                                                            @if ($item->kelas)
+                                                                {{ $item->kelas->nama_kelas }}
+                                                            @else
+                                                                Nama Kelas not assigned
+                                                            @endif
+                                                        </td>
                                                         <td style="vertical-align: middle;">{{ $item->tahun_ajaran }}</td>    
                                                         <td style="vertical-align: middle;">{{ $item->mapel->nama_pelajaran}}</td>   
                                                         <td style="vertical-align: middle;">
@@ -93,7 +86,7 @@
                                                                 {{-- <a href="{{ route( 'guruMapel.edit', $item->id_gp) }}" class="btn btn-danger" style="margin-right: 10px;">
                                                                     <i class="fas fa-heart" style="font-size: 18px;"></i>
                                                                 </a> --}}
-                                                                 <a style="margin-right: 10px;" href="{{ route( 'guruMapel.edit', $item->id_gp) }}" class="btn btn-sm btn-warning">Detail</a>
+                                                                 <a style="margin-right: 10px;" href="{{ route( 'dataNilai.detail', $item->id_gp) }}" class="btn btn-sm btn-warning">Detail</a>
                                                             </div>													
 														</td>
 					                                </tr>

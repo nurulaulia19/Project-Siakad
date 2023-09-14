@@ -20,4 +20,9 @@ class KategoriNilai extends Model
     {
         return $this->belongsTo(Sekolah::class, 'id_sekolah', 'id_sekolah');
     }
+
+    public function guruMapel()
+    {
+        return $this->hasMany(GuruPelajaran::class, 'id_kn', 'id_kn');
+    }
 }

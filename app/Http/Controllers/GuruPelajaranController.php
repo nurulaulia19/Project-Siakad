@@ -11,9 +11,11 @@ use App\Models\Data_Menu;
 use Illuminate\Http\Request;
 use App\Models\DataPelajaran;
 use App\Models\GuruPelajaran;
-use App\Models\GuruPelajaranJadwal;
+use App\Models\KategoriNilai;
+use App\Models\KenaikanKelas;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use App\Models\GuruPelajaranJadwal;
 
 class GuruPelajaranController extends Controller
 {
@@ -268,44 +270,78 @@ class GuruPelajaranController extends Controller
     public function nilai() {
         $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->orderBy('id_gp', 'DESC')->paginate(10);
 
-        // menu
-        $user_id = auth()->user()->user_id;
-        $user = DataUser::findOrFail($user_id);
-        $menu_ids = $user->role->roleMenus->pluck('menu_id');
-
-        $menu_route_name = request()->route()->getName(); // Nama route dari URL yang diminta
-
-        // Ambil menu berdasarkan menu_link yang sesuai dengan nama route
-        $requested_menu = Data_Menu::where('menu_link', $menu_route_name)->first();
-        // dd($requested_menu);
-
-        // Periksa izin akses berdasarkan menu_id dan user_id
-        if (!$requested_menu || !$menu_ids->contains($requested_menu->menu_id)) {
-            return redirect()->back()->with('error', 'You do not have permission to access this menu.');
-        }
-
-        $mainMenus = Data_Menu::where('menu_category', 'master menu')
-            ->whereIn('menu_id', $menu_ids)
-            ->get();
-
-        $menuItemsWithSubmenus = [];
-
-        foreach ($mainMenus as $mainMenu) {
-            $subMenus = Data_Menu::where('menu_sub', $mainMenu->menu_id)
-                ->where('menu_category', 'sub menu')
-                ->whereIn('menu_id', $menu_ids)
-                ->orderBy('menu_position')
-                ->get();
-
-            $menuItemsWithSubmenus[] = [
-                'mainMenu' => $mainMenu,
-                'subMenus' => $subMenus,
-            ];
-            
-    }
+        // MENU
+        $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
+    
+                $user = DataUser::find($user_id);
+                $role_id = $user->role_id;
+    
+                $menu_ids = RoleMenu::where('role_id', $role_id)->pluck('menu_id');
+    
+                $mainMenus = Data_Menu::where('menu_category', 'master menu')
+                    ->whereIn('menu_id', $menu_ids)
+                    ->get();
+    
+                $menuItemsWithSubmenus = [];
+    
+                foreach ($mainMenus as $mainMenu) {
+                    $subMenus = Data_Menu::where('menu_sub', $mainMenu->menu_id)
+                        ->where('menu_category', 'sub menu')
+                        ->whereIn('menu_id', $menu_ids)
+                        ->orderBy('menu_position')
+                        ->get();
+    
+                    $menuItemsWithSubmenus[] = [
+                        'mainMenu' => $mainMenu,
+                        'subMenus' => $subMenus,
+                    ];
+                }
     return view('dataNilai.nilai', compact('dataGp','menuItemsWithSubmenus'));
     }
 
+
+    public function detailNilai($id_gp) {
+        // $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->orderBy('id_gp', 'DESC')->paginate(10);
+        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->where('id_gp', $id_gp)->get();
+        $dataKn = KategoriNilai::all();
+
+        $dataSekolah = Sekolah::all();
+
+        
+        $dataKk = KenaikanKelas::orderBy('id_kk', 'desc')
+            ->select('id_sekolah', 'id_kelas', 'tahun_ajaran', DB::raw('GROUP_CONCAT(id_kk, ", ") as id_kk'), DB::raw('GROUP_CONCAT(nis_siswa SEPARATOR ", ") as nis_siswa'))
+            ->groupBy('id_sekolah', 'id_kelas', 'tahun_ajaran')
+            ->paginate(10);
+    
+
+        // MENU
+        $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
+    
+                $user = DataUser::find($user_id);
+                $role_id = $user->role_id;
+    
+                $menu_ids = RoleMenu::where('role_id', $role_id)->pluck('menu_id');
+    
+                $mainMenus = Data_Menu::where('menu_category', 'master menu')
+                    ->whereIn('menu_id', $menu_ids)
+                    ->get();
+    
+                $menuItemsWithSubmenus = [];
+    
+                foreach ($mainMenus as $mainMenu) {
+                    $subMenus = Data_Menu::where('menu_sub', $mainMenu->menu_id)
+                        ->where('menu_category', 'sub menu')
+                        ->whereIn('menu_id', $menu_ids)
+                        ->orderBy('menu_position')
+                        ->get();
+    
+                    $menuItemsWithSubmenus[] = [
+                        'mainMenu' => $mainMenu,
+                        'subMenus' => $subMenus,
+                    ];
+                }
+    return view('dataNilai.detail', compact('dataGp','menuItemsWithSubmenus','dataKn','dataKk'));
+    }
 //     public function tampilkanForm()
 // {
 //     // Di sini Anda dapat menyiapkan data yang diperlukan untuk form

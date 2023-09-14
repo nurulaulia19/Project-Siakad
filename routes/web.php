@@ -208,7 +208,8 @@ Route::get('/admin/guruMapel/destroy/{id}', [GuruPelajaranController::class,'des
 Route::get('/admin/guruMapel/getKelas', [GuruPelajaranController::class, 'getKelas'])->name('guruMapel.getKelas');
 Route::get('/admin/guruMapel/getMapel', [GuruPelajaranController::class, 'getMapel'])->name('guruMapel.getMapel');
 
-Route::get('/admin/guruMapel/nilai', [GuruPelajaranController::class,'nilai'])->name('dataNilai.nilai');
+Route::get('/admin/dataNilai/nilai', [GuruPelajaranController::class,'nilai'])->name('dataNilai.nilai');
+Route::get('/admin/dataNilai/detail/{id}', [GuruPelajaranController::class, 'detailNilai'])->name('dataNilai.detail');
 
 // guru pelajaran jadwal
 Route::post('/admin/guruMapelJadwal/store', [GuruPelajaranJadwalController::class, 'store'])->name('guruMapelJadwal.store');
