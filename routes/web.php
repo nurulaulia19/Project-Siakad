@@ -20,6 +20,7 @@ use App\Http\Controllers\JasaController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DataNilaiController;
 use App\Http\Controllers\DataPelajaranController;
 use App\Http\Controllers\DataSiswaController;
 use App\Http\Controllers\DataTokoController;
@@ -208,12 +209,18 @@ Route::get('/admin/guruMapel/destroy/{id}', [GuruPelajaranController::class,'des
 Route::get('/admin/guruMapel/getKelas', [GuruPelajaranController::class, 'getKelas'])->name('guruMapel.getKelas');
 Route::get('/admin/guruMapel/getMapel', [GuruPelajaranController::class, 'getMapel'])->name('guruMapel.getMapel');
 
+// data nilai
 Route::get('/admin/dataNilai/nilai', [GuruPelajaranController::class,'nilai'])->name('dataNilai.nilai');
-Route::get('/admin/dataNilai/detail/{id}', [GuruPelajaranController::class, 'detailNilai'])->name('dataNilai.detail');
+Route::get('/admin/dataNilai/detail/{id_gp}', [GuruPelajaranController::class, 'detailNilai'])->name('dataNilai.detail');
+Route::post('/admin/dataNilai/store', [GuruPelajaranController::class, 'storeNilai'])->name('dataNilai.store');
+Route::get('/admin/dataNilai/produk', [DataProdukController::class,'laporanProduk'])->name('laporan.laporanProduk');
+Route::get('/export/pdf/{id_gp}', [GuruPelajaranController::class, 'exportToPDF'])->name('export.pdf');
+Route::get('/export/excel', [GuruPelajaranController::class, 'exportToExcel'])->name('export.excel');
 
 // guru pelajaran jadwal
 Route::post('/admin/guruMapelJadwal/store', [GuruPelajaranJadwalController::class, 'store'])->name('guruMapelJadwal.store');
 Route::get('/admin/guruMapelJadwal/destroy/{id_gpj}', [GuruPelajaranJadwalController::class, 'destroy'])->name('guruMapelJadwal.destroy');
+
 
 // ketegori nilai
 Route::put('/admin/kategoriNilai/update/{id}', [KategoriNilaiController::class, 'update'])->name('kategoriNilai.update');
@@ -222,3 +229,5 @@ Route::get('/admin/kategoriNilai', [KategoriNilaiController::class,'index'])->na
 Route::get('/admin/kategoriNilai/edit/{id}', [KategoriNilaiController::class, 'edit'])->name('kategoriNilai.edit');
 Route::post('/kategoriNilai/store', [KategoriNilaiController::class, 'store']);
 Route::get('/admin/kategoriNilai/destroy/{id}', [KategoriNilaiController::class,'destroy'])->name('kategoriNilai.destroy');
+
+

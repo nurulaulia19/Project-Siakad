@@ -31,8 +31,17 @@ class KenaikanKelas extends Model
     
     public function siswa()
     {
-        return $this->belongsTo(DataSiswa::class, 'id_siswa', 'id_siswa');
+        return $this->belongsTo(DataSiswa::class, 'nis_siswa', 'nis_siswa');
     }
     
+    public function guruPelajaran()
+    {
+        return $this->belongsTo(GuruPelajaran::class, 'id_gp', 'id_gp');
+    }
+
     
+    // public function nilai()
+    // {
+    //     return $this->hasMany(DataNilai::class, 'id_kk', 'id_kk');
+    // }
 }

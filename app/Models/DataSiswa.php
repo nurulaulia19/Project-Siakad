@@ -30,7 +30,12 @@ class DataSiswa extends Model
 
     public function kenaikanKelas()
     {
-        return $this->hasMany(KenaikanKelas::class, 'id_siswa', 'id_siswa');
+        return $this->hasMany(KenaikanKelas::class, 'nis_siswa', 'nis_siswa');
+    }
+
+    public function guruPelajaran()
+    {
+        return $this->hasMany(GuruPelajaran::class, 'id_siswa', 'id_siswa');
     }
 
 }

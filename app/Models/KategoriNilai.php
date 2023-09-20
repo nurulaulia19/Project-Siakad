@@ -25,4 +25,9 @@ class KategoriNilai extends Model
     {
         return $this->hasMany(GuruPelajaran::class, 'id_kn', 'id_kn');
     }
+
+    public function nilai()
+    {
+        return $this->hasMany(DataNilai::class, 'id_kn', 'kategori');
+    }
 }

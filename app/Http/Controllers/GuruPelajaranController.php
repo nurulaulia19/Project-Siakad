@@ -8,6 +8,8 @@ use App\Models\Sekolah;
 use App\Models\DataUser;
 use App\Models\RoleMenu;
 use App\Models\Data_Menu;
+use App\Models\DataNilai;
+use App\Models\DataSiswa;
 use Illuminate\Http\Request;
 use App\Models\DataPelajaran;
 use App\Models\GuruPelajaran;
@@ -16,6 +18,9 @@ use App\Models\KenaikanKelas;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Models\GuruPelajaranJadwal;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Illuminate\Support\Facades\View;
 
 class GuruPelajaranController extends Controller
 {
@@ -300,20 +305,50 @@ class GuruPelajaranController extends Controller
     }
 
 
-    public function detailNilai($id_gp) {
+    public function detailNilai(Request $request, $id_gp) {
         // $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->orderBy('id_gp', 'DESC')->paginate(10);
-        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->where('id_gp', $id_gp)->get();
+        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel','siswa')->where('id_gp', $id_gp)->first();
         $dataKn = KategoriNilai::all();
 
         $dataSekolah = Sekolah::all();
 
+        $id_nilai = 13;
+        $dataNilai = DataNilai::where('id_nilai', $id_nilai)->first();
+        // $dataNilai = DataNilai::select('nilai', $id_gp)->first();
+        // dd($dataNilai);
+        $tab = $request->query('tab');
         
-        $dataKk = KenaikanKelas::orderBy('id_kk', 'desc')
-            ->select('id_sekolah', 'id_kelas', 'tahun_ajaran', DB::raw('GROUP_CONCAT(id_kk, ", ") as id_kk'), DB::raw('GROUP_CONCAT(nis_siswa SEPARATOR ", ") as nis_siswa'))
-            ->groupBy('id_sekolah', 'id_kelas', 'tahun_ajaran')
-            ->paginate(10);
-    
 
+        if ($dataGp->count() > 0) {
+            // Mengambil objek GuruPelajaran pertama dari koleksi
+            $guruPelajaran = $dataGp;
+        
+            // Mengakses properti tahun_ajaran dari objek GuruPelajaran
+            $tahunAjaran = $guruPelajaran->tahun_ajaran;
+        
+            // 3. Gunakan tahun ajaran sebagai filter dalam query
+            $dataKk = KenaikanKelas::join('data_guru_pelajaran', 'data_kenaikan_kelas.id_kelas', '=', 'data_guru_pelajaran.id_kelas')
+                ->where('data_guru_pelajaran.id_gp', $id_gp)
+                ->where('data_kenaikan_kelas.tahun_ajaran', '=', $tahunAjaran)
+                ->orderBy('data_kenaikan_kelas.id_kk', 'desc')
+                ->select(
+                    // 'data_kenaikan_kelas.id_sekolah',
+                    // 'data_kenaikan_kelas.id_kelas',
+                    // 'data_kenaikan_kelas.tahun_ajaran',
+                    'data_kenaikan_kelas.id_kk', // Kolom id_kk
+                    'data_kenaikan_kelas.nis_siswa', // Kolom nis_siswa
+                )
+                ->with('siswa') 
+                ->paginate(10);
+                // dd($dataKk);
+        } else {
+            // Handle jika data GuruPelajaran tidak ditemukan
+            session()->flash('warning', 'Data Guru Pelajaran tidak ditemukan.');
+            return redirect()->back();
+        }
+        
+        
+        // dd($id_gp);
         // MENU
         $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
     
@@ -340,12 +375,73 @@ class GuruPelajaranController extends Controller
                         'subMenus' => $subMenus,
                     ];
                 }
-    return view('dataNilai.detail', compact('dataGp','menuItemsWithSubmenus','dataKn','dataKk'));
-    }
-//     public function tampilkanForm()
-// {
-//     // Di sini Anda dapat menyiapkan data yang diperlukan untuk form
-//     return view('guruMapel.jadwal');
-// }
 
+        return view('dataNilai.detail', compact('dataGp','menuItemsWithSubmenus','dataKn','dataKk','dataNilai','tab','id_gp'));
+    }
+
+    public function storeNilai(Request $request)
+    {
+        $nis_siswa = $request->input('nis_siswa');
+        $nilai = $request->input('nilai');
+        $id_gp = $request->input('id_gp');
+        $kategori = $request->input('kategori');
+
+        // Hapus data yang sudah ada dengan kriteria yang sama
+        DataNilai::where('id_gp', $id_gp)
+            ->where('kategori', $kategori)
+            ->whereIn('nis_siswa', $nis_siswa)
+            ->delete();
+
+        // Simpan data baru
+        foreach ($nis_siswa as $key => $nis) {
+            $dataNilai = new DataNilai;
+            $dataNilai->id_gp = $id_gp;
+            $dataNilai->kategori = $kategori;
+            $dataNilai->nis_siswa = $nis;
+            $dataNilai->nilai = $nilai[$key];
+            $dataNilai->save();
+        }
+
+        return redirect()->route('dataNilai.detail', ['id_gp' => $id_gp, 'tab'=> $kategori
+        ])->with('success', 'Nilai insert successfully');
+    }
+
+
+    public static function getNilai ($id_gp, $kategori, $nis_siswa) {
+        // $id_nilai = 13;
+        $dataNilai = DataNilai::where('id_gp', $id_gp)
+        ->where('kategori', $kategori)
+        ->where('nis_siswa', $nis_siswa)->first();
+
+        return @$dataNilai->nilai;
+    }
+
+
+    public function exportToPDF(Request $request, $id_gp)
+    {
+        $dataKk = KenaikanKelas::all();
+        $dataKn = KategoriNilai::all();
+        $tab = $request->query('tab');
+        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel','siswa')->where('id_gp', $id_gp)->first();
+        $paperSize = $request->input('paper_size', 'A4');
+
+        // $dataNilai = $query->get();
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        // Set ukuran kertas sesuai dengan parameter yang diambil dari request
+        $pdfOptions->set('size', $paperSize);
+
+        $pdf = new Dompdf($pdfOptions);
+
+        // Render the view with data and get the HTML content
+        $htmlContent = View::make('dataNilai.eksportNilai', compact('dataKk','dataGp','dataKn','tab'))->render();
+
+        $pdf->loadHtml($htmlContent);
+
+        $pdf->setPaper($paperSize, 'portrait'); // Atur ukuran kertas secara dinamis
+
+        $pdf->render();
+
+        return $pdf->stream('data-nilai.pdf');
+    }
 }
