@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use App\Models\Role;
 use App\Models\Kelas;
 use App\Models\Sekolah;
@@ -10,17 +12,18 @@ use App\Models\RoleMenu;
 use App\Models\Data_Menu;
 use App\Models\DataNilai;
 use App\Models\DataSiswa;
+use App\Exports\NilaiExport;
 use Illuminate\Http\Request;
 use App\Models\DataPelajaran;
 use App\Models\GuruPelajaran;
 use App\Models\KategoriNilai;
 use App\Models\KenaikanKelas;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Models\GuruPelajaranJadwal;
-use Dompdf\Dompdf;
-use Dompdf\Options;
 use Illuminate\Support\Facades\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GuruPelajaranController extends Controller
 {
@@ -272,9 +275,10 @@ class GuruPelajaranController extends Controller
         return response()->json($mapel);
     }
 
-    public function nilai() {
-        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->orderBy('id_gp', 'DESC')->paginate(10);
-
+    public function nilai(Request $request) {
+        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel','kategoriNilai')->orderBy('id_gp', 'DESC')->paginate(10);
+        $id_kn = $request->input('id_kn');
+        // dd($id_kn);
         // MENU
         $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
     
@@ -301,7 +305,7 @@ class GuruPelajaranController extends Controller
                         'subMenus' => $subMenus,
                     ];
                 }
-    return view('dataNilai.nilai', compact('dataGp','menuItemsWithSubmenus'));
+    return view('dataNilai.nilai', compact('dataGp','menuItemsWithSubmenus','id_kn'));
     }
 
 
@@ -309,15 +313,10 @@ class GuruPelajaranController extends Controller
         // $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->orderBy('id_gp', 'DESC')->paginate(10);
         $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel','siswa')->where('id_gp', $id_gp)->first();
         $dataKn = KategoriNilai::all();
-
-        $dataSekolah = Sekolah::all();
-
-        $id_nilai = 13;
-        $dataNilai = DataNilai::where('id_nilai', $id_nilai)->first();
-        // $dataNilai = DataNilai::select('nilai', $id_gp)->first();
-        // dd($dataNilai);
         $tab = $request->query('tab');
-        
+        $dataSekolah = Sekolah::all();
+        $id_kn = session('id_kn');
+       
 
         if ($dataGp->count() > 0) {
             // Mengambil objek GuruPelajaran pertama dari koleksi
@@ -341,12 +340,26 @@ class GuruPelajaranController extends Controller
                 ->with('siswa') 
                 ->paginate(10);
                 // dd($dataKk);
+
+                // $dataKk = KenaikanKelas::join('data_guru_pelajaran', 'data_kenaikan_kelas.id_kelas', '=', 'data_guru_pelajaran.id_kelas')
+                // ->join('data_kategori_nilai', 'data_kategori_nilai.id_sekolah', '=', 'data_guru_pelajaran.id_sekolah')
+                // ->where('data_guru_pelajaran.id_gp', $id_gp)
+                // ->where('data_kenaikan_kelas.tahun_ajaran', '=', $tahunAjaran)
+                // ->where('data_kategori_nilai.id_kn', $id_kn) // Menambahkan kondisi WHERE untuk id_kn
+                // ->orderBy('data_kenaikan_kelas.id_kk', 'desc')
+                // ->select(
+                //     'data_kenaikan_kelas.id_kk',
+                //     'data_kenaikan_kelas.nis_siswa'
+                // )
+                // ->with('siswa')
+                // ->paginate(10);
         } else {
             // Handle jika data GuruPelajaran tidak ditemukan
             session()->flash('warning', 'Data Guru Pelajaran tidak ditemukan.');
             return redirect()->back();
         }
         
+
         
         // dd($id_gp);
         // MENU
@@ -376,7 +389,7 @@ class GuruPelajaranController extends Controller
                     ];
                 }
 
-        return view('dataNilai.detail', compact('dataGp','menuItemsWithSubmenus','dataKn','dataKk','dataNilai','tab','id_gp'));
+        return view('dataNilai.detail', compact('dataGp','menuItemsWithSubmenus','dataKn','dataKk','tab','id_gp'));
     }
 
     public function storeNilai(Request $request)
@@ -417,12 +430,59 @@ class GuruPelajaranController extends Controller
     }
 
 
-    public function exportToPDF(Request $request, $id_gp)
+    public function exportToPDF(Request $request, $id_gp, $id_kn)
     {
-        $dataKk = KenaikanKelas::all();
-        $dataKn = KategoriNilai::all();
-        $tab = $request->query('tab');
         $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel','siswa')->where('id_gp', $id_gp)->first();
+        // $requested_menu = Data_Menu::where('menu_link', $menu_route_name)->first();
+        $dataKn = KategoriNilai::where('id_kn', $id_kn)->first();
+
+        $dataSekolah = Sekolah::all();
+        $tab = $request->query('tab');
+        $kategori = KategoriNilai::all();
+        
+
+        if ($dataGp->count() > 0) {
+            // Mengambil objek GuruPelajaran pertama dari koleksi
+            $guruPelajaran = $dataGp;
+        
+            // Mengakses properti tahun_ajaran dari objek GuruPelajaran
+            $tahunAjaran = $guruPelajaran->tahun_ajaran;
+        
+            // 3. Gunakan tahun ajaran sebagai filter dalam query
+            // $dataKk = KenaikanKelas::join('data_guru_pelajaran', 'data_kenaikan_kelas.id_kelas', '=', 'data_guru_pelajaran.id_kelas')
+            //     ->where('data_guru_pelajaran.id_gp', $id_gp)
+            //     ->where('data_kenaikan_kelas.tahun_ajaran', '=', $tahunAjaran)
+            //     ->orderBy('data_kenaikan_kelas.id_kk', 'desc')
+            //     ->select(
+            //         // 'data_kenaikan_kelas.id_sekolah',
+            //         // 'data_kenaikan_kelas.id_kelas',
+            //         // 'data_kenaikan_kelas.tahun_ajaran',
+            //         'data_kenaikan_kelas.id_kk', // Kolom id_kk
+            //         'data_kenaikan_kelas.nis_siswa', // Kolom nis_siswa
+            //     )
+            //     ->with('siswa') 
+            //     ->get();
+            $dataKk = KenaikanKelas::join('data_guru_pelajaran', 'data_kenaikan_kelas.id_kelas', '=', 'data_guru_pelajaran.id_kelas')
+            ->join('data_kategori_nilai', 'data_kategori_nilai.id_sekolah', '=', 'data_guru_pelajaran.id_sekolah')
+            ->where('data_guru_pelajaran.id_gp', $id_gp)
+            ->where('data_kenaikan_kelas.tahun_ajaran', '=', $tahunAjaran)
+            ->where('data_kategori_nilai.id_kn', $id_kn) // Menambahkan kondisi WHERE untuk id_kn
+            ->orderBy('data_kenaikan_kelas.id_kk', 'desc')
+            ->select(
+                'data_kenaikan_kelas.id_kk',
+                'data_kenaikan_kelas.nis_siswa'
+            )
+            ->with('siswa')
+            ->get();
+
+            // dd($dataKk);
+        } else {
+            // Handle jika data GuruPelajaran tidak ditemukan
+            session()->flash('warning', 'Data Guru Pelajaran tidak ditemukan.');
+            return redirect()->back();
+        }
+        
+        
         $paperSize = $request->input('paper_size', 'A4');
 
         // $dataNilai = $query->get();
@@ -434,7 +494,7 @@ class GuruPelajaranController extends Controller
         $pdf = new Dompdf($pdfOptions);
 
         // Render the view with data and get the HTML content
-        $htmlContent = View::make('dataNilai.eksportNilai', compact('dataKk','dataGp','dataKn','tab'))->render();
+        $htmlContent = View::make('dataNilai.eksportNilai', compact('dataKk','dataGp','dataKn','tab','kategori'))->render();
 
         $pdf->loadHtml($htmlContent);
 
@@ -444,4 +504,43 @@ class GuruPelajaranController extends Controller
 
         return $pdf->stream('data-nilai.pdf');
     }
+
+    public function exportToExcel(Request $request, $id_gp, $id_kn)
+    {
+        $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel','siswa')->where('id_gp', $id_gp)->first();
+            // $requested_menu = Data_Menu::where('menu_link', $menu_route_name)->first();
+        $dataKn = KategoriNilai::where('id_kn', $id_kn)->first();
+
+        $dataSekolah = Sekolah::all();
+        $tab = $request->query('tab');
+            if ($dataGp->count() > 0) {
+                // Mengambil objek GuruPelajaran pertama dari koleksi
+                $guruPelajaran = $dataGp;
+            
+                // Mengakses properti tahun_ajaran dari objek GuruPelajaran
+                $tahunAjaran = $guruPelajaran->tahun_ajaran;
+            
+                $dataKk = KenaikanKelas::join('data_guru_pelajaran', 'data_kenaikan_kelas.id_kelas', '=', 'data_guru_pelajaran.id_kelas')
+                ->join('data_kategori_nilai', 'data_kategori_nilai.id_sekolah', '=', 'data_guru_pelajaran.id_sekolah')
+                ->where('data_guru_pelajaran.id_gp', $id_gp)
+                ->where('data_kenaikan_kelas.tahun_ajaran', '=', $tahunAjaran)
+                ->where('data_kategori_nilai.id_kn', $id_kn) // Menambahkan kondisi WHERE untuk id_kn
+                ->orderBy('data_kenaikan_kelas.id_kk', 'desc')
+                ->select(
+                    'data_kenaikan_kelas.id_kk',
+                    'data_kenaikan_kelas.nis_siswa'
+                )
+                ->with('siswa')
+                ->get();
+
+                // dd($dataKk);
+            } else {
+                // Handle jika data GuruPelajaran tidak ditemukan
+                session()->flash('warning', 'Data Guru Pelajaran tidak ditemukan.');
+                return redirect()->back();
+            }
+
+        return Excel::download(new NilaiExport($dataKn, $dataGp, $dataSekolah, $tab, $dataKk), 'data-nilai.xlsx');
+    }
 }
+

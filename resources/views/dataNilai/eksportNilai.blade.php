@@ -27,57 +27,72 @@
 
         }
 
+        h1 {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .profile-label {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .profile-value {
+            flex: 2;
+            text-align: right;
+        }
+
+        /* Optional: Add spacing between label-value pairs */
+        .profile-info tr + tr {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="tab-content">
-        @foreach ($dataKn as $key => $kategori)
-            <div id="kategori-{{ $kategori->id_kn }}" class="tab-pane {{ $tab == $kategori->id_kn ? 'active' : '' }}">
-            {{-- <div id="kategori-{{ $kategori->id_kn }}" class="tab-pane {{ $tab == $kategori->id_kn || ($tab === null && $key === 0) ? 'active' : '' }}"> --}}
-                <form action="{{ route('dataNilai.store') }}" method="POST">
-                    @csrf
-                    {{-- <input name="id_gp" type="text" value="{{ $item->id_gp }}" readonly> --}}
-                    <input type="hidden" id="data_id_gp" value="{{ $dataGp->id_gp }}" name="id_gp">
-                    <input name="kategori" type="hidden" value="{{ $kategori->id_kn }}">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>NIS</th>
-                                    <th>Nama</th>
-                                    <th>Nilai</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($dataKk as $item)
-                                @php
-                                    $nilai = App\Http\Controllers\GuruPelajaranController::getNilai($dataGp->id_gp, $kategori->id_kn, $item->nis_siswa);
-                                @endphp
-                                    <tr>
-                                        <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
-                                        <td style="vertical-align: middle;">
-                                            {{ $item->nis_siswa }}
-                                            <input name="nis_siswa[]" type="hidden" value="{{ $item->nis_siswa }}" readonly>
-                                        </td>
-                                        <td style="vertical-align: middle;">
-                                            @if ($item->siswa)
-                                                {{ $item->siswa->nama_siswa }}
-                                            @else
-                                                Siswa not found
-                                            @endif
-                                        </td>
-                                        <td style="vertical-align: middle;">
-                                            <input class="form-control" value="{{ $nilai }}" name="nilai[]" type="text" style="width: 100px;">
-                                        </td>                                                                                                       
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
-            </div>
-        @endforeach
+    <div class="table-responsive">
+        <div class="profile-info">
+            <h3 class="mb-3" style="text-align: center">Data Nilai</h3>
+            @foreach ([
+                'Sekolah' => $dataGp->sekolah ? $dataGp->sekolah->nama_sekolah : 'Nama Sekolah not assigned',
+                'Kelas' => $dataGp->kelas ? $dataGp->kelas->nama_kelas : 'Nama kelas not assigned',
+                'Tahun Ajaran' => $dataGp->tahun_ajaran,
+                'Mata Pelajaran' => $dataGp->mapel->nama_pelajaran,
+                'Guru' => $dataGp->user ? $dataGp->user->user_name : 'Nama Guru not assigned',
+            ] as $label => $value)
+            <div class="profile-label">{{ $label }}:</div>
+            <div class="profile-value">{{ $value }}</div>
+            @endforeach
+        </div>
+        
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="text-align: center;">No</th>
+                    <th style="text-align: center;">NIS</th>
+                    <th style="text-align: center;">Nama</th>
+                    <th style="text-align: center;">Nilai</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($dataKk as $item)
+                @php
+                    $nilai = App\Http\Controllers\GuruPelajaranController::getNilai($dataGp->id_gp, $dataKn->id_kn, $item->nis_siswa);
+                @endphp
+                    <tr>
+                        <td style="text-align: center;">{{ $loop->iteration }}</td>
+                        <td style="text-align: center;">{{ $item->nis_siswa }}</td>
+                        <td style="text-align: center;">
+                            @if ($item->siswa)
+                                {{ $item->siswa->nama_siswa }}
+                            @else
+                                Siswa not found
+                            @endif
+                        </td>
+                        <td style="text-align: center;">{{ $nilai }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 </body>
 </html>

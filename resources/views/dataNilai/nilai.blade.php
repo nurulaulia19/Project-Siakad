@@ -86,7 +86,10 @@
                                                                 {{-- <a href="{{ route( 'guruMapel.edit', $item->id_gp) }}" class="btn btn-danger" style="margin-right: 10px;">
                                                                     <i class="fas fa-heart" style="font-size: 18px;"></i>
                                                                 </a> --}}
-                                                                 <a style="margin-right: 10px;" href="{{ route( 'dataNilai.detail', $item->id_gp) }}" class="btn btn-sm btn-warning">Detail</a>
+                                                                 {{-- <a style="margin-right: 10px;" href="{{ route( 'dataNilai.detail', $item->id_gp) }}" class="btn btn-sm btn-warning">Detail</a> --}}
+                                                                 {{-- <input type="hidden" name="id_kn" value="{{ $id_kn }}">
+                                                                 <a style="margin-right: 10px;" href="{{ route('dataNilai.detail', ['id_gp' => $item->id_gp]) }}" class="btn btn-sm btn-warning">Detail</a> --}}
+                                                                 <a style="margin-right: 10px;" href="{{ route('dataNilai.detail', ['id_gp' => $item->id_gp, 'id_kn' => $id_kn]) }}" class="btn btn-sm btn-warning">Detail</a>
                                                             </div>													
 														</td>
 					                                </tr>

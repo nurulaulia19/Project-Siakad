@@ -30,4 +30,6 @@ class KategoriNilai extends Model
     {
         return $this->hasMany(DataNilai::class, 'id_kn', 'kategori');
     }
+
 }
+

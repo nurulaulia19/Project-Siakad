@@ -42,7 +42,7 @@
                           <div class="panel-body">
                                         <div class="fixed-fluid">
                                             <div class="fixed-md-200 pull-sm-left fixed-right-border">
-                                                <div>
+                                                <div style="display: flex; justify-content:center">
                                                     {{-- <div class="profile-card">
                                                         <h4 class="profile-name">
                                                             @if ($dataGp->sekolah)
@@ -126,21 +126,16 @@
                                                     
                                                     {{-- bener --}}
                                                     <div class="container">
-                                                        <div style="display:flex; justify-content:end">
-                                                            {{-- <a href="{{ route('export.pdf') }}" class="btn btn-danger" style="margin-right: 10px;">Export to PDF</a> --}}
-                                                            <a href="{{ route('export.pdf', ['id_gp' => $id_gp]) }}" class="btn btn-danger" style="margin-right: 10px;">Export to PDF</a>
-                                                            <a href="{{ route('export.excel') }}" class="btn btn-success">Export to Excel</a>
-                                                        </div>
+                                                        
                                                         <ul class="nav nav-tabs" id="kategori-tabs">
                                                             @foreach ($dataKn as $key => $kategori)
                                                                 {{-- @foreach ($dataGp as $item) --}}
                                                                     @if ($dataGp->sekolah && $dataGp->sekolah->id_sekolah == $kategori->id_sekolah)
                                                                         <li class="{{ $tab == $kategori->id_kn ? 'active' : '' }}">
-                                                                        {{-- <li class="{{ $tab == $kategori->id_kn || ($tab === null && $key === 0) ? 'active' : '' }}"> --}}
                                                                             <a data-toggle="tab" href="#kategori-{{ $kategori->id_kn }}" data-id-gp="{{ $dataGp->id_gp }}">{{ $kategori->kategori }}</a>
                                                                             {{-- <a data-toggle="tab" href="#kategori-{{ $kategori->id_kn }}" data-id-gp="{{ $dataGp->id_gp }}" data-id-kn="{{ $kategori->id_kn }}" class="kategori-tab">{{ $kategori->kategori }}</a> --}}
                                                                             <input name="kategori" type="hidden" value="{{ $kategori->id_kn }}" readonly>
-                                                                            {{-- <input name="id_gp" type="text" value="{{ $item->id_gp }}" readonly> --}}
+                                                                            {{-- <a href="{{ route('export.pdf', ['id_gp' => $id_gp]) }}#kategori-{{ $kategori->id_kn }}" class="btn btn-danger" style="margin-right: 10px;">Export to PDF</a> --}}
                                                                         </li>
                                                                     @endif
                                                                 {{-- @endforeach --}}
@@ -149,6 +144,11 @@
                                                         <div class="tab-content">
                                                             @foreach ($dataKn as $key => $kategori)
                                                                 <div id="kategori-{{ $kategori->id_kn }}" class="tab-pane {{ $tab == $kategori->id_kn ? 'active' : '' }}">
+                                                                    <div style="display:flex; justify-content:end">
+                                                                        {{-- <a href="{{ route('export.pdf', ['id_gp' => $id_gp]) }}" class="btn btn-danger" style="margin-right: 10px;">Export to PDF</a> --}}
+                                                                        <a style="margin-right: 10px;" href="{{ route('export.pdf', ['id_gp' => $id_gp, 'id_kn' => $kategori->id_kn]) }}" class="btn btn-sm btn-danger">Export to PDF</a>
+                                                                        <a href="{{ route('export.excel', ['id_gp' => $id_gp, 'id_kn' => $kategori->id_kn]) }}" class="btn btn-success">Export to Excel</a>
+                                                                    </div>
                                                                 {{-- <div id="kategori-{{ $kategori->id_kn }}" class="tab-pane {{ $tab == $kategori->id_kn || ($tab === null && $key === 0) ? 'active' : '' }}"> --}}
                                                                     <form action="{{ route('dataNilai.store') }}" method="POST">
                                                                         @csrf

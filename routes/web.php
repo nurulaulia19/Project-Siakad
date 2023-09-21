@@ -214,8 +214,8 @@ Route::get('/admin/dataNilai/nilai', [GuruPelajaranController::class,'nilai'])->
 Route::get('/admin/dataNilai/detail/{id_gp}', [GuruPelajaranController::class, 'detailNilai'])->name('dataNilai.detail');
 Route::post('/admin/dataNilai/store', [GuruPelajaranController::class, 'storeNilai'])->name('dataNilai.store');
 Route::get('/admin/dataNilai/produk', [DataProdukController::class,'laporanProduk'])->name('laporan.laporanProduk');
-Route::get('/export/pdf/{id_gp}', [GuruPelajaranController::class, 'exportToPDF'])->name('export.pdf');
-Route::get('/export/excel', [GuruPelajaranController::class, 'exportToExcel'])->name('export.excel');
+Route::get('/export/pdf/{id_gp}/{id_kn}', [GuruPelajaranController::class, 'exportToPDF'])->name('export.pdf');
+Route::get('/export/excel/{id_gp}/{id_kn}', [GuruPelajaranController::class, 'exportToExcel'])->name('export.excel');
 
 // guru pelajaran jadwal
 Route::post('/admin/guruMapelJadwal/store', [GuruPelajaranJadwalController::class, 'store'])->name('guruMapelJadwal.store');
