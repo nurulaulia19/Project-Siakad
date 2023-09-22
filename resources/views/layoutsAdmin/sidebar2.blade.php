@@ -211,6 +211,7 @@
 									'Data Siswa' => 'fas fa-users',
 									'Data Kenaikan Kelas' => 'fas fa-graduation-cap',
 									'Data Nilai' => 'fas fa-chart-bar',
+									'Data Absensi' => 'fas fa-clock',
 								];
 
 							@endphp

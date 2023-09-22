@@ -10,7 +10,14 @@
         .table-bordered {
             border-collapse: collapse;
             width: 100%;
+            margin-top: 20px;
             
+        }
+
+         .table-profile {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 30px;
         }
 
         /* Style for table header cells */
@@ -27,41 +34,64 @@
 
         }
 
+        .table-profile td {
+            padding: 8px;
+
+        }
+
         h1 {
             text-align: center;
             padding: 20px;
         }
+        .profile-column {
+            padding: 10px; /* Sesuaikan sesuai kebutuhan */
+        }
 
         .profile-label {
-            flex: 1;
             font-weight: bold;
         }
 
         .profile-value {
-            flex: 2;
-            text-align: right;
+            text-transform: capitalize;
         }
 
-        /* Optional: Add spacing between label-value pairs */
-        .profile-info tr + tr {
-            margin-top: 20px;
+        .profile-colon {
+            float: right;
         }
+
     </style>
 </head>
 <body>
     <div class="table-responsive">
         <div class="profile-info">
-            <h3 class="mb-3" style="text-align: center">Data Nilai</h3>
-            @foreach ([
-                'Sekolah' => $dataGp->sekolah ? $dataGp->sekolah->nama_sekolah : 'Nama Sekolah not assigned',
-                'Kelas' => $dataGp->kelas ? $dataGp->kelas->nama_kelas : 'Nama kelas not assigned',
-                'Tahun Ajaran' => $dataGp->tahun_ajaran,
-                'Mata Pelajaran' => $dataGp->mapel->nama_pelajaran,
-                'Guru' => $dataGp->user ? $dataGp->user->user_name : 'Nama Guru not assigned',
-            ] as $label => $value)
-            <div class="profile-label">{{ $label }}:</div>
-            <div class="profile-value">{{ $value }}</div>
-            @endforeach
+            {{-- <h3 class="mb-3" style="text-align: center">Laporan Nilai Siswa</h3> --}}
+            <h3 class="mb-3" style="text-align: center">Laporan Nilai {{ $dataKn->kategori }} Siswa </h3>
+            <table class="table table-profile">
+                <tbody>
+                    @php
+                    $data = [
+                        'Sekolah' => $dataGp->sekolah ? $dataGp->sekolah->nama_sekolah : 'Nama Sekolah not assigned',
+                        'Kelas' => $dataGp->kelas ? $dataGp->kelas->nama_kelas : 'Nama kelas not assigned',
+                        'Tahun Ajaran' => $dataGp->tahun_ajaran,
+                        'Mata Pelajaran' => $dataGp->mapel->nama_pelajaran,
+                        'Guru' => $dataGp->user ? $dataGp->user->user_name : 'Nama Guru not assigned',
+                    ];
+
+                    // Mengonversi data asosiatif ke array dengan 2 elemen per item
+                    $dataChunks = array_chunk($data, 2, true);
+                    @endphp
+
+                    @foreach ($dataChunks as $chunk)
+                    <tr>
+                        @foreach ($chunk as $label => $value)
+                        {{-- <td class="profile-label" style="text-align: right;">{{ $label }}:</td> --}}
+                        <td class="profile-label">{{ $label }}<span class="profile-colon">:</span></td>
+                        <td class="profile-value">{{ $value }}</td>
+                        @endforeach
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table> 
         </div>
         
         <table class="table table-bordered">

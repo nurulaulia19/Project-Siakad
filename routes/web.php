@@ -217,6 +217,11 @@ Route::get('/admin/dataNilai/produk', [DataProdukController::class,'laporanProdu
 Route::get('/export/pdf/{id_gp}/{id_kn}', [GuruPelajaranController::class, 'exportToPDF'])->name('export.pdf');
 Route::get('/export/excel/{id_gp}/{id_kn}', [GuruPelajaranController::class, 'exportToExcel'])->name('export.excel');
 
+// data absensi
+Route::get('/admin/dataAbsensi/absensi', [GuruPelajaranController::class,'absensi'])->name('dataAbsensi.absensi');
+Route::get('/admin/dataAbsensi/detail/{id_gp}', [GuruPelajaranController::class, 'detailAbsensi'])->name('dataAbsensi.detail');
+Route::post('/admin/dataAbsensi/store', [GuruPelajaranController::class, 'storeAbsensi'])->name('dataAbsensi.store');
+
 // guru pelajaran jadwal
 Route::post('/admin/guruMapelJadwal/store', [GuruPelajaranJadwalController::class, 'store'])->name('guruMapelJadwal.store');
 Route::get('/admin/guruMapelJadwal/destroy/{id_gpj}', [GuruPelajaranJadwalController::class, 'destroy'])->name('guruMapelJadwal.destroy');

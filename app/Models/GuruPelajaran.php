@@ -67,4 +67,9 @@ class GuruPelajaran extends Model
     {
         return $this->hasMany(DataNilai::class, 'id_gp', 'id_gp');
     }
+
+    public function absensi()
+    {
+        return $this->hasMany(DataAbsensi::class, 'id_gp', 'id_gp');
+    }
 }
