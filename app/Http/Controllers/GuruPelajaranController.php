@@ -14,6 +14,7 @@ use App\Models\DataNilai;
 use App\Models\DataSiswa;
 use App\Models\DataAbsensi;
 use App\Exports\NilaiExport;
+use App\Models\AbsensiDetail;
 use Illuminate\Http\Request;
 use App\Models\DataPelajaran;
 use App\Models\GuruPelajaran;
@@ -340,20 +341,7 @@ class GuruPelajaranController extends Controller
                 )
                 ->with('siswa') 
                 ->paginate(10);
-                // dd($dataKk);
 
-                // $dataKk = KenaikanKelas::join('data_guru_pelajaran', 'data_kenaikan_kelas.id_kelas', '=', 'data_guru_pelajaran.id_kelas')
-                // ->join('data_kategori_nilai', 'data_kategori_nilai.id_sekolah', '=', 'data_guru_pelajaran.id_sekolah')
-                // ->where('data_guru_pelajaran.id_gp', $id_gp)
-                // ->where('data_kenaikan_kelas.tahun_ajaran', '=', $tahunAjaran)
-                // ->where('data_kategori_nilai.id_kn', $id_kn) // Menambahkan kondisi WHERE untuk id_kn
-                // ->orderBy('data_kenaikan_kelas.id_kk', 'desc')
-                // ->select(
-                //     'data_kenaikan_kelas.id_kk',
-                //     'data_kenaikan_kelas.nis_siswa'
-                // )
-                // ->with('siswa')
-                // ->paginate(10);
         } else {
             // Handle jika data GuruPelajaran tidak ditemukan
             session()->flash('warning', 'Data Guru Pelajaran tidak ditemukan.');
@@ -578,13 +566,12 @@ class GuruPelajaranController extends Controller
     }
 
     public function detailAbsensi(Request $request, $id_gp) {
-        // $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel')->orderBy('id_gp', 'DESC')->paginate(10);
         $dataGp = GuruPelajaran::with('user','kelas','sekolah','mapel','siswa')->where('id_gp', $id_gp)->first();
-        // $dataKn = KategoriNilai::all();
+        // $dataAd = DataAbsensi::where('id_gp', $id_gp)->get();
         $tab = $request->query('tab');
         $dataSekolah = Sekolah::all();
-        // $id_kn = session('id_kn');
-        $dataAbsensi = DataAbsensi::all();
+        $dataAbsensi = DataAbsensi::where('id_gp', $id_gp)->get();
+        // $tab = $request->query('tab');
     
         if ($dataGp->count() > 0) {
             // Mengambil objek GuruPelajaran pertama dari koleksi
@@ -607,20 +594,6 @@ class GuruPelajaranController extends Controller
                 )
                 ->with('siswa') 
                 ->get();
-            // $dataKk = KenaikanKelas::join('data_guru_pelajaran', 'data_kenaikan_kelas.id_kelas', '=', 'data_guru_pelajaran.id_kelas')
-            // ->join('data_kategori_nilai', 'data_kategori_nilai.id_sekolah', '=', 'data_guru_pelajaran.id_sekolah')
-            // ->where('data_guru_pelajaran.id_gp', $id_gp)
-            // ->where('data_kenaikan_kelas.tahun_ajaran', '=', $tahunAjaran)
-            // ->where('data_kategori_nilai.id_kn', $id_kn) // Menambahkan kondisi WHERE untuk id_kn
-            // ->orderBy('data_kenaikan_kelas.id_kk', 'desc')
-            // ->select(
-            //     'data_kenaikan_kelas.id_kk',
-            //     'data_kenaikan_kelas.nis_siswa'
-            // )
-            // ->with('siswa')
-            // ->get();
-
-            // dd($dataKk);
         } else {
             // Handle jika data GuruPelajaran tidak ditemukan
             session()->flash('warning', 'Data Guru Pelajaran tidak ditemukan.');
@@ -654,7 +627,7 @@ class GuruPelajaranController extends Controller
                     ];
                 }
 
-        return view('dataAbsensi.detail', compact('dataGp','menuItemsWithSubmenus','tab','dataAbsensi','dataKk'));
+        return view('dataAbsensi.detail', compact('dataGp','menuItemsWithSubmenus','tab','dataAbsensi','dataKk','tab'));
     }
 
     public function storeAbsensi(Request $request)
@@ -665,9 +638,75 @@ class GuruPelajaranController extends Controller
         $dataAbsensi->tanggal = $request->tanggal;
         $dataAbsensi->save();
 
-        return redirect()->route('dataAbsensi.detail', ['id_gp' => $id_gp
+        return redirect()->route('dataAbsensi.detail', ['id_gp' => $id_gp, 
         ])->with('success', 'Absensi insert successfully');
+
+        
             
+    }
+
+    public function storeAbsensiDetail(Request $request)
+    {
+        $id_absensi = $request->input('id_absensi');
+        $nis_siswa = $request->input('nis_siswa');
+        $id_gp = $request->input('id_gp');
+        $keterangan = $request->input('keterangan');
+        $tanggal = $request->input('tanggal');
+
+        // Hapus data yang sudah ada dengan kriteria yang sama
+        AbsensiDetail::where('id_gp', $id_gp)
+            ->where('id_absensi', $id_absensi)
+            ->where('tanggal', $tanggal)
+            ->delete();
+
+        // Simpan data baru
+        foreach ($nis_siswa as $key => $nis_value) {
+            $dataAd = new AbsensiDetail();
+            $dataAd->id_gp = $id_gp;
+            $dataAd->id_absensi = $id_absensi;
+            $dataAd->nis_siswa = $nis_value;
+            $dataAd->keterangan = $keterangan[$key];
+            $dataAd->tanggal = $tanggal;
+            $dataAd->save();
+        }
+
+        return redirect()->route('dataAbsensi.detail', ['id_gp' => $id_gp, 'tab'=> $id_absensi
+        ])->with('success', 'Absensi Detail insert successfully');
+            
+        // return redirect()->route('dataNilai.detail', ['id_gp' => $id_gp, 'tab'=> $kategori
+        // ])->with('success', 'Nilai insert successfully');
+    }
+
+    public function destroyAbsensi($id_absensi){
+        // 1. Cari id_gp dan data absensi detail berdasarkan id_absensi
+        $dataAbsensi = DataAbsensi::where('id_absensi', $id_absensi)->first();
+        
+        // Pastikan id_gp ditemukan sebelum melanjutkan
+        if (!$dataAbsensi) {
+            return redirect()->route('dataAbsensi.index')->with('error', 'Data Absensi tidak ditemukan.');
+        }
+        
+        // 2. Lakukan penghapusan data absensi detail dengan id_absensi yang sama
+        AbsensiDetail::where('id_absensi', $id_absensi)->delete();
+        
+        // 3. Lakukan penghapusan data absensi
+        $dataAbsensi->delete();
+        
+        // 4. Gunakan id_gp dalam pengalihan
+        $id_gp = $dataAbsensi->id_gp;
+        
+        return redirect()->route('dataAbsensi.detail', ['id_gp' => $id_gp])
+            ->with('success', 'Data Absensi berhasil dihapus.');
+    }
+    
+    public static function getAbsensiDetail ($id_gp, $id_absensi, $tanggal, $nis_siswa) {
+        // $id_nilai = 13;
+        $dataAd = AbsensiDetail::where('id_gp', $id_gp)
+        ->where('id_absensi', $id_absensi)
+        ->where('tanggal', $tanggal)
+        ->where('nis_siswa', $nis_siswa)->first();
+
+        return @$dataAd->keterangan;
     }
 }
 

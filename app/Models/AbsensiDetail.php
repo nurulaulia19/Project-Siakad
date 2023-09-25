@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DataAbsensi extends Model
+class AbsensiDetail extends Model
 {
     use HasFactory;
-    protected $table = "data_absensi";
-    protected $primaryKey = 'id_absensi';
+    protected $table = "data_absensi_detail";
+    protected $primaryKey = 'id_ad';
     protected $fillable = [
-            'id_absensi',
+            'id_ad',
             'id_gp',
+            'id_absensi',
             'tanggal',
+            'nis_siswa',
+            'keterangan'
     ];
 
     public function guruPelajaran()
@@ -21,8 +24,8 @@ class DataAbsensi extends Model
         return $this->belongsTo(GuruPelajaran::class, 'id_gp', 'id_gp');
     }
 
-    public function absensiDetail()
+    public function absensi()
     {
-        return $this->hasMany(AbsensiDetail::class, 'id_absensi', 'id_absensi');
+        return $this->belongsTo(DataAbsensi::class, 'id_absensi', 'id_absensi');
     }
 }
