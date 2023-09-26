@@ -169,7 +169,7 @@
                                                                                                     @endif
                                                                                                 </td>
                                                                                                 <td style="vertical-align: middle;">
-                                                                                                    <select class="form-control" name="keterangan[]" style="width: 100px;">
+                                                                                                    <select class="form-control" name="keterangan[]" style="width: 100px;" required>
                                                                                                         <option value="" @if ($keterangan == '') selected @endif>Pilih</option>
                                                                                                         <option value="hadir" @if ($keterangan == 'hadir') selected @endif>H</option>
                                                                                                         <option value="izin" @if ($keterangan == 'izin') selected @endif>I</option>

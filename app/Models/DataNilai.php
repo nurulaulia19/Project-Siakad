@@ -28,4 +28,19 @@ class DataNilai extends Model
         return $this->belongsTo(KategoriNilai::class, 'id_kn', 'kategori');
     }
 
+    public function sekolah()
+    {
+        return $this->belongsTo(Sekolah::class, 'id_sekolah', 'id_sekolah');
+    }
+
+    
+    public function siswa()
+    {
+        return $this->belongsTo(DataSiswa::class, 'nis_siswa', 'nis_siswa');
+    }
+
+    public function mapel()
+    {
+        return $this->belongsTo(DataPelajaran::class, 'id_pelajaran', 'id_pelajaran');
+    }
 }

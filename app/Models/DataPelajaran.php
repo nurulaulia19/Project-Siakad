@@ -22,16 +22,6 @@ class DataPelajaran extends Model
         return $this->belongsTo(Sekolah::class, 'id_sekolah', 'id_sekolah');
     }
 
-    // public function user()
-    // {
-    //     return $this->belongsTo(DataUser::class, 'user_id', 'user_id');
-    // }
-
-    // public function mapelList()
-    // {
-    //     return $this->hasMany(PelajaranKelasList::class, 'id_sekolah', 'id_sekolah');
-    // }
-
     public function mapelList()
     {
         return $this->hasMany(PelajaranKelasList::class, 'id_pelajaran', 'id_pelajaran');
@@ -40,5 +30,10 @@ class DataPelajaran extends Model
     public function guruMapel()
     {
         return $this->hasMany(GuruPelajaran::class, 'id_pelajaran', 'id_pelajaran');
+    }
+
+    public function nilai()
+    {
+        return $this->hasMany(DataNilai::class, 'id_pelajaran', 'id_pelajaran');
     }
 }

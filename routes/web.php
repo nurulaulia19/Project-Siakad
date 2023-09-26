@@ -34,6 +34,7 @@ use App\Http\Controllers\PelajaranKelasController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\SekolahController;
+use App\Models\GuruPelajaran;
 use App\Models\TransaksiDetail;
 
 /*
@@ -238,4 +239,6 @@ Route::get('/admin/kategoriNilai/edit/{id}', [KategoriNilaiController::class, 'e
 Route::post('/kategoriNilai/store', [KategoriNilaiController::class, 'store']);
 Route::get('/admin/kategoriNilai/destroy/{id}', [KategoriNilaiController::class,'destroy'])->name('kategoriNilai.destroy');
 
-
+// cek nilai
+Route::get('/admin/dataNilai/cekNilai', [GuruPelajaranController::class,'cekNilai'])->name('dataNilai.cekNilai');
+Route::post('/admin/dataNilai/tampilkanNilai', [GuruPelajaranController::class,'tampilkanNilai'])->name('dataNilai.tampilkanNilai');

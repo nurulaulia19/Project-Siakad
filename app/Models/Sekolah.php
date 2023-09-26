@@ -50,4 +50,9 @@ class Sekolah extends Model
     {
         return $this->hasMany(KategoriNilai::class, 'id_sekolah', 'id_sekolah');
     }
+
+    public function nilai()
+    {
+        return $this->hasMany(DataNilai::class, 'id_sekolah', 'id_sekolah');
+    }
 }

@@ -647,6 +647,10 @@ class GuruPelajaranController extends Controller
 
     public function storeAbsensiDetail(Request $request)
     {
+        $this->validate($request, [
+            'keterangan' => 'required',
+        ]);
+
         $id_absensi = $request->input('id_absensi');
         $nis_siswa = $request->input('nis_siswa');
         $id_gp = $request->input('id_gp');
@@ -708,5 +712,97 @@ class GuruPelajaranController extends Controller
 
         return @$dataAd->keterangan;
     }
+
+    public function cekNilai()
+    {
+        $dataSekolah = Sekolah::all();
+        $dataSiswa = DataSiswa::all();
+
+        // Check if the form has been submitted
+        if (request()->isMethod('post')) {
+            $id_sekolah = request()->input('id_sekolah');
+            $nis_siswa = request()->input('nis_siswa');
+
+            // Query the database to retrieve grades based on $id_sekolah and $nis_siswa
+            $dataNilai = DataNilai::where('id_sekolah', $id_sekolah)
+                ->whereIn('nis_siswa', $nis_siswa)
+                ->get();
+        } else {
+            // If the form hasn't been submitted yet, initialize $dataNilai as an empty array
+            $dataNilai = [];
+        }
+        // MENU
+        $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
+
+            $user = DataUser::find($user_id);
+            $role_id = $user->role_id;
+
+            $menu_ids = RoleMenu::where('role_id', $role_id)->pluck('menu_id');
+
+            $mainMenus = Data_Menu::where('menu_category', 'master menu')
+                ->whereIn('menu_id', $menu_ids)
+                ->get();
+
+            $menuItemsWithSubmenus = [];
+
+            foreach ($mainMenus as $mainMenu) {
+                $subMenus = Data_Menu::where('menu_sub', $mainMenu->menu_id)
+                    ->where('menu_category', 'sub menu')
+                    ->whereIn('menu_id', $menu_ids)
+                    ->orderBy('menu_position')
+                    ->get();
+
+                $menuItemsWithSubmenus[] = [
+                    'mainMenu' => $mainMenu,
+                    'subMenus' => $subMenus,
+                ];
+            }
+        return view('dataNilai.cekNilai', compact('dataSekolah','dataSiswa','dataNilai','menuItemsWithSubmenus'));
+    }
+
+    public function tampilkanNilai(Request $request)
+    {
+        $nis_siswa = $request->input('nis_siswa');
+        $dataSekolah = Sekolah::all();
+        // Ambil data nilai berdasarkan nis_siswa yang dipilih
+        // $dataNilai = DataNilai::whereIn('nis_siswa', $nis_siswa)->get();
+        $dataNilai = DataNilai::with('guruPelajaran.mapel','siswa')->whereIn('nis_siswa', $nis_siswa)->get();
+
+        
+
+        // dd($dataNilai);
+
+        $user_id = auth()->user()->user_id; // Use 'user_id' instead of 'id'
+
+            $user = DataUser::find($user_id);
+            $role_id = $user->role_id;
+
+            $menu_ids = RoleMenu::where('role_id', $role_id)->pluck('menu_id');
+
+            $mainMenus = Data_Menu::where('menu_category', 'master menu')
+                ->whereIn('menu_id', $menu_ids)
+                ->get();
+
+            $menuItemsWithSubmenus = [];
+
+            foreach ($mainMenus as $mainMenu) {
+                $subMenus = Data_Menu::where('menu_sub', $mainMenu->menu_id)
+                    ->where('menu_category', 'sub menu')
+                    ->whereIn('menu_id', $menu_ids)
+                    ->orderBy('menu_position')
+                    ->get();
+
+                $menuItemsWithSubmenus[] = [
+                    'mainMenu' => $mainMenu,
+                    'subMenus' => $subMenus,
+                ];
+            }
+
+        return view('dataNilai.cekNilai', compact('nis_siswa', 'dataNilai', 'dataSekolah','menuItemsWithSubmenus'));
+    }
+
+
+
 }
+
 
